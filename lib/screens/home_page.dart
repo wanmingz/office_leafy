@@ -170,11 +170,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
              entry.key.day == today.day;
     }).length;
     
+    print('Debug - Daily Records:');
+    print('Today: ${today.toString()}');
+    print('Number of records today: $todayRecords');
+    
     // 如果今天已经获得3个 Leafy Hearts，就不允许再获得
-    if (todayRecords >= 3) {
+    if (todayRecords > 3) {
+      print('Debug - Daily limit reached');
       return false;
     }
     
+    print('Debug - Can still record mood today');
     return true;
   }
 
@@ -183,6 +189,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     print('New mood: $mood');
     print('Note: $note');
     print('Current emotion before update: $currentEmotion');
+    print('Current Leafy Hearts count: $leafyHeartsCount');
     
     setState(() {
       // Store mood with note
@@ -192,12 +199,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         'note': note,
       };
       
+      print('Debug - Mood stored in log');
+      print('Total mood logs: ${moodLog.length}');
+      
       // Update current emotion
       currentEmotion = mood;
       
       // 只有在未达到每日限制时才增加 Leafy Hearts
       if (canRecordMoodToday()) {
+        print('Debug - Can record mood today, increasing Leafy Hearts');
         leafyHeartsCount++;
+        print('Debug - New Leafy Hearts count: $leafyHeartsCount');
         
         // Show congratulations dialog
         showDialog(
@@ -241,6 +253,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         );
       } else {
+        print('Debug - Daily limit reached, not increasing Leafy Hearts');
         // 如果达到每日限制，显示提示信息
         showDialog(
           context: context,
@@ -265,7 +278,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your mood has been recorded, but you\'ve reached your daily Leafy Hearts limit. Your plant will be waiting for more love tomorrow!',
+                  'Your mood has been recorded, but you\'ve reached your daily limit of 3 Leafy Hearts. Your plant will be waiting for more love tomorrow!',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Color(0xFF1B5E20),
@@ -285,7 +298,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       }
       
       print('Debug - Updated emotion: $currentEmotion');
-      print('Debug - Total mood logs: ${moodLog.length}');
+      print('Debug - Final Leafy Hearts count: $leafyHeartsCount');
       
       // Display a mood-specific comforting quote
       final moodQuotes = comfortingQuotes[mood] ?? [];
