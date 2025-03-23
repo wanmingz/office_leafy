@@ -1,55 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
-import 'calendar_page.dart';
 import 'bag_page.dart';
 
-class ShopPage extends StatefulWidget {
-  final int leafyHearts;
-  final Map<DateTime, Map<String, dynamic>> moodLog;
-  final Function(int) onLeafyHeartsUpdate;
-  final Function(String) onItemPurchased;
-  final int waterCount;
-  final int fertilizerCount;
+class ShopPage extends StatelessWidget {
+  const ShopPage({super.key});
 
-  const ShopPage({
-    super.key, 
-    required this.leafyHearts,
-    required this.moodLog,
-    required this.onLeafyHeartsUpdate,
-    required this.onItemPurchased,
-    required this.waterCount,
-    required this.fertilizerCount,
-  });
-
-  @override
-  State<ShopPage> createState() => _ShopPageState();
-}
-
-class _ShopPageState extends State<ShopPage> {
-  int _currentLeafyHearts = 0;
-  late int _waterCount;
-  late int _fertilizerCount;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentLeafyHearts = widget.leafyHearts;
-    _waterCount = widget.waterCount;
-    _fertilizerCount = widget.fertilizerCount;
-  }
-
-  void _handlePurchase(String item, int price) {
-    if (_currentLeafyHearts >= price) {
-      setState(() {
-        _currentLeafyHearts -= price;
-        if (item == 'Water') {
-          _waterCount++;
-        } else if (item == 'Fertilizer') {
-          _fertilizerCount++;
-        }
-      });
-      widget.onLeafyHeartsUpdate(_currentLeafyHearts);
-      widget.onItemPurchased(item);
+  void _handlePurchase(BuildContext context, String item, int price) {
+    final itemState = context.read<ItemState>();
+    
+    if (itemState.leafyHeartsCount >= price) {
+      itemState.useLeafyHearts(price);
+      if (item == 'Water') {
+        itemState.purchaseWater();
+      } else if (item == 'Fertilizer') {
+        itemState.purchaseFertilizer();
+      }
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -68,6 +35,8 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   void _showPurchaseDialog(BuildContext context, String item, int price) {
+    final itemState = context.read<ItemState>();
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -79,7 +48,7 @@ class _ShopPageState extends State<ShopPage> {
           children: [
             Text('This will cost $price Leafy Heart${price > 1 ? 's' : ''}.'),
             const SizedBox(height: 8),
-            Text('You have $_currentLeafyHearts Leafy Heart${_currentLeafyHearts > 1 ? 's' : ''}.'),
+            Text('You have ${itemState.leafyHeartsCount} Leafy Heart${itemState.leafyHeartsCount > 1 ? 's' : ''}.'),
           ],
         ),
         actions: [
@@ -90,7 +59,7 @@ class _ShopPageState extends State<ShopPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _handlePurchase(item, price);
+              _handlePurchase(context, item, price);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B5E20),
@@ -105,6 +74,8 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
+    final itemState = context.watch<ItemState>();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -129,7 +100,7 @@ class _ShopPageState extends State<ShopPage> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '$_currentLeafyHearts',
+                  '${itemState.leafyHeartsCount}',
                   style: const TextStyle(
                     color: Color(0xFF1B5E20),
                     fontWeight: FontWeight.bold,
@@ -162,7 +133,7 @@ class _ShopPageState extends State<ShopPage> {
               Icons.water_drop,
               Colors.blue,
               1,
-              _waterCount,
+              itemState.waterCount,
             ),
             const SizedBox(height: 16),
             _buildShopItem(
@@ -172,7 +143,7 @@ class _ShopPageState extends State<ShopPage> {
               Icons.eco,
               Colors.green,
               2,
-              _fertilizerCount,
+              itemState.fertilizerCount,
             ),
           ],
         ),
@@ -202,9 +173,6 @@ class _ShopPageState extends State<ShopPage> {
               icon: Icons.home,
               label: 'Home',
               onPressed: () {
-                widget.onItemPurchased('Water');
-                widget.onItemPurchased('Fertilizer');
-                widget.onLeafyHeartsUpdate(_currentLeafyHearts);
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               isSelected: false,
@@ -215,25 +183,7 @@ class _ShopPageState extends State<ShopPage> {
               label: 'Trends',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EmotionTrendPage(
-                  widget.moodLog,
-                  leafyHeartsCount: _currentLeafyHearts,
-                  onLeafyHeartsUpdate: widget.onLeafyHeartsUpdate,
-                )),
-              ),
-              isSelected: false,
-            ),
-            _buildNavButton(
-              context: context,
-              icon: Icons.calendar_month,
-              label: 'Calendar',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CalendarPage(
-                  widget.moodLog,
-                  leafyHeartsCount: _currentLeafyHearts,
-                  onLeafyHeartsUpdate: widget.onLeafyHeartsUpdate,
-                )),
+                MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
               ),
               isSelected: false,
             ),
@@ -250,77 +200,11 @@ class _ShopPageState extends State<ShopPage> {
               label: 'Bag',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BagPage(
-                  leafyHearts: _currentLeafyHearts,
-                  moodLog: widget.moodLog,
-                  waterCount: _waterCount,
-                  fertilizerCount: _fertilizerCount,
-                  onItemUsed: (item) {
-                    setState(() {
-                      if (item == 'Water') {
-                        _waterCount--;
-                      } else if (item == 'Fertilizer') {
-                        _fertilizerCount--;
-                      }
-                    });
-                  },
-                )),
+                MaterialPageRoute(builder: (context) => const BagPage()),
               ),
               isSelected: false,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavButton({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required VoidCallback onPressed,
-    required bool isSelected,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 24,
-                color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                shadows: [
-                  Shadow(
-                    color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  )
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                  shadows: [
-                    Shadow(
-                      color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -432,6 +316,58 @@ class _ShopPageState extends State<ShopPage> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    required bool isSelected,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
+                shadows: [
+                  Shadow(
+                    color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
+                    offset: const Offset(0, 1),
+                    blurRadius: 2,
+                  )
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
+                  shadows: [
+                    Shadow(
+                      color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
+                      offset: const Offset(0, 1),
+                      blurRadius: 2,
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

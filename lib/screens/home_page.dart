@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'calendar_page.dart';
+import 'package:provider/provider.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import 'bag_page.dart';
+import '../providers/item_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,14 +13,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  final Map<DateTime, Map<String, dynamic>> moodLog = {};
-  String plantStatus = "Growing healthy";
-  int waterCount = 0;
-  int fertilizerCount = 0;
-  int plantGrowthStage = 1;
-  DateTime lastGrowthUpdate = DateTime.now();
-  int leafyHeartsCount = 0;
-  
+  String displayedQuote = "";
+  final TextEditingController _noteController = TextEditingController();
+  String? selectedMood;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
   // Updated comforting quotes with mood-specific messages
   Map<String, List<String>> comfortingQuotes = {
     'Happy': [
@@ -53,24 +52,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       "You're doing your best 🌟"
     ]
   };
-  
-  String displayedQuote = "";
-  
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  // Updated to include notes
-  String currentEmotion = "Happy"; // Default emotion
-  
-  // Text controller for note input
-  final TextEditingController _noteController = TextEditingController();
-  String? selectedMood;
 
   @override
   void initState() {
     super.initState();
-    checkTimeBasedGrowth();
-    
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -80,6 +65,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+
+    // 初始化时检查植物生长
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ItemState>().updatePlantGrowth();
+    });
   }
   
   @override
@@ -87,25 +77,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animationController.dispose();
     _noteController.dispose();
     super.dispose();
-  }
-
-  void checkTimeBasedGrowth() {
-    DateTime now = DateTime.now();
-    int daysSinceLastGrowth = now.difference(lastGrowthUpdate).inDays;
-    
-    print('Debug - Plant Growth Status:');
-    print('Current Stage: $plantGrowthStage');
-    print('Days since last growth: $daysSinceLastGrowth');
-    print('Last growth update: ${lastGrowthUpdate.toString()}');
-    
-    // Plant grows after 3 days, regardless of emotion
-    if (daysSinceLastGrowth >= 3 && plantGrowthStage < 2) {
-      print('Debug - Plant is growing to next stage!');
-      setState(() {
-        plantGrowthStage++;
-        lastGrowthUpdate = now;
-      });
-    }
   }
 
   void showMoodNoteDialog(String mood) {
@@ -146,7 +117,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // 先关闭添加笔记的对话框
+              Navigator.pop(context);
               recordMoodWithNote(mood, _noteController.text);
             },
             style: ElevatedButton.styleFrom(
@@ -161,190 +132,110 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  // 添加每日记录次数的检查方法
-  bool canRecordMoodToday() {
-    final today = DateTime.now();
-    final todayRecords = moodLog.entries.where((entry) {
-      return entry.key.year == today.year &&
-             entry.key.month == today.month &&
-             entry.key.day == today.day;
-    }).length;
-    
-    print('Debug - Daily Records:');
-    print('Today: ${today.toString()}');
-    print('Number of records today: $todayRecords');
-    
-    // 如果今天已经获得3个 Leafy Hearts，就不允许再获得
-    if (todayRecords > 3) {
-      print('Debug - Daily limit reached');
-      return false;
-    }
-    
-    print('Debug - Can still record mood today');
-    return true;
-  }
-
   void recordMoodWithNote(String mood, String note) {
-    print('Debug - Mood Recording:');
-    print('New mood: $mood');
-    print('Note: $note');
-    print('Current emotion before update: $currentEmotion');
-    print('Current Leafy Hearts count: $leafyHeartsCount');
+    final itemState = context.read<ItemState>();
     
-    setState(() {
-      // Store mood with note
-      final now = DateTime.now();
-      moodLog[now] = {
-        'mood': mood,
-        'note': note,
-      };
+    // 记录心情
+    itemState.recordMood(mood, note);
+    
+    // 只有在未达到每日限制时才增加 Leafy Hearts
+    if (itemState.canRecordMoodToday()) {
+      itemState.addLeafyHeart();
       
-      print('Debug - Mood stored in log');
-      print('Total mood logs: ${moodLog.length}');
-      
-      // Update current emotion
-      currentEmotion = mood;
-      
-      // 只有在未达到每日限制时才增加 Leafy Hearts
-      if (canRecordMoodToday()) {
-        print('Debug - Can record mood today, increasing Leafy Hearts');
-        leafyHeartsCount++;
-        print('Debug - New Leafy Hearts count: $leafyHeartsCount');
-        
-        // Show congratulations dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.favorite,
-                  color: const Color(0xFF1B5E20),
-                  size: 48,
+      // Show congratulations dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.favorite,
+                color: const Color(0xFF1B5E20),
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Congratulations!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1B5E20),
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Congratulations!',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1B5E20),
-                  ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'You got 1 Leafy Heart!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF1B5E20),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'You got 1 Leafy Heart!',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1B5E20),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-        );
-      } else {
-        print('Debug - Daily limit reached, not increasing Leafy Hearts');
-        // 如果达到每日限制，显示提示信息
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.favorite,
-                  color: const Color(0xFF1B5E20),
-                  size: 48,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Daily Limit Reached',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1B5E20),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Your mood has been recorded, but you\'ve reached your daily limit of 3 Leafy Hearts. Your plant will be waiting for more love tomorrow!',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1B5E20),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+          ],
+        ),
+      );
+    } else {
+      // 如果达到每日限制，显示提示信息
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.favorite,
+                color: const Color(0xFF1B5E20),
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Daily Limit Reached',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1B5E20),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Your mood has been recorded, but you\'ve reached your daily limit of 3 Leafy Hearts. Your plant will be waiting for more love tomorrow!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF1B5E20),
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-        );
-      }
-      
-      print('Debug - Updated emotion: $currentEmotion');
-      print('Debug - Final Leafy Hearts count: $leafyHeartsCount');
-      
-      // Display a mood-specific comforting quote
-      final moodQuotes = comfortingQuotes[mood] ?? [];
-      if (moodQuotes.isNotEmpty) {
-        displayedQuote = (moodQuotes..shuffle()).first;
-        print('Debug - Selected quote: $displayedQuote');
-        _animationController.reset();
-        _animationController.forward();
-      }
-    });
-  }
-
-  String getPlantImage() {
-    // Get the base stage image based on growth stage
-    String baseImage = 'assets/plants/stage$plantGrowthStage.png';
-    
-    // Add emotion suffix based on current emotion
-    String emotionSuffix = '';
-    switch (currentEmotion) {
-      case 'Happy':
-        emotionSuffix = '_happy';
-        break;
-      case 'Excited':
-        emotionSuffix = '_excited';
-        break;
-      case 'Loved':
-        emotionSuffix = '_loved';
-        break;
-      case 'Sad':
-        emotionSuffix = '_sad';
-        break;
-      case 'Stressed':
-        emotionSuffix = '_stressed';
-        break;
-      default:
-        emotionSuffix = '_happy';
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
     
-    String finalImage = baseImage.replaceAll('.png', '$emotionSuffix.png');
-    print('Debug - Plant Image:');
-    print('Base image: $baseImage');
-    print('Current emotion: $currentEmotion');
-    print('Emotion suffix: $emotionSuffix');
-    print('Final image path: $finalImage');
-    
-    return finalImage;
+    // Display a mood-specific comforting quote
+    final moodQuotes = comfortingQuotes[mood] ?? [];
+    if (moodQuotes.isNotEmpty) {
+      setState(() {
+        displayedQuote = (moodQuotes..shuffle()).first;
+      });
+      _animationController.reset();
+      _animationController.forward();
+    }
   }
 
   String getWorkModeMessage() {
@@ -377,42 +268,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  // 添加一个方法来更新 Leafy Hearts 数量
-  void updateLeafyHeartsCount(int newValue) {
-    setState(() {
-      leafyHeartsCount = newValue;
-    });
-  }
-
-  // 处理物品购买
-  void _handleItemPurchased(String item) {
-    setState(() {
-      if (item == 'Water') {
-        waterCount++;
-      } else if (item == 'Fertilizer') {
-        fertilizerCount++;
-      }
-    });
-  }
-
-  // 处理物品使用
-  void _handleItemUsed(String item) {
-    setState(() {
-      if (item == 'Water') {
-        if (waterCount > 0) waterCount--;
-      } else if (item == 'Fertilizer') {
-        if (fertilizerCount > 0) fertilizerCount--;
-      } else if (item == 'LeafyHearts') {
-        // 更新 Leafy Hearts 数量
-        updateLeafyHeartsCount(leafyHeartsCount);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final screenHeight = MediaQuery.of(context).size.height;
+    final itemState = context.watch<ItemState>();
     
     return Scaffold(
       appBar: AppBar(
@@ -421,10 +281,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
-            color: Color(0xFF1B5E20), // 深绿色
+            color: Color(0xFF1B5E20),
           ),
         ),
-        backgroundColor: const Color(0xFFFFFCF5), // 温暖的米白色
+        backgroundColor: const Color(0xFFFFFCF5),
         elevation: 0,
         actions: [
           Container(
@@ -438,7 +298,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '$leafyHeartsCount',
+                  '${itemState.leafyHeartsCount}',
                   style: const TextStyle(
                     color: Color(0xFF1B5E20),
                     fontWeight: FontWeight.bold,
@@ -456,8 +316,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFFCF5), // 温暖的米白色
-              Color(0xFFFFFCF5), // 温暖的米白色
+              Color(0xFFFFFCF5),
+              Color(0xFFFFFCF5),
             ],
           ),
         ),
@@ -497,7 +357,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: index < plantGrowthStage 
+                              color: index < itemState.plantGrowthStage 
                                 ? colorScheme.primary 
                                 : colorScheme.primaryContainer.withOpacity(0.3),
                               boxShadow: [
@@ -515,11 +375,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       // Plant image
                       Hero(
                         tag: 'plant_image',
-                        child: Container(
+                        child: SizedBox(
                           height: screenHeight * 0.32,
                           width: screenHeight * 0.32,
                           child: Image.asset(
-                            getPlantImage(),
+                            'assets/plants/stage${itemState.plantGrowthStage}_${itemState.currentEmotion.toLowerCase()}.png',
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -740,25 +600,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               label: 'Trends',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EmotionTrendPage(
-                  moodLog,
-                  leafyHeartsCount: leafyHeartsCount,
-                  onLeafyHeartsUpdate: updateLeafyHeartsCount,
-                )),
-              ),
-              isSelected: false,
-            ),
-            _buildNavButton(
-              context: context,
-              icon: Icons.calendar_month,
-              label: 'Calendar',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CalendarPage(
-                  moodLog,
-                  leafyHeartsCount: leafyHeartsCount,
-                  onLeafyHeartsUpdate: updateLeafyHeartsCount,
-                )),
+                MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
               ),
               isSelected: false,
             ),
@@ -768,14 +610,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               label: 'Shop',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ShopPage(
-                  leafyHearts: leafyHeartsCount,
-                  moodLog: moodLog,
-                  onLeafyHeartsUpdate: updateLeafyHeartsCount,
-                  onItemPurchased: _handleItemPurchased,
-                  waterCount: waterCount,
-                  fertilizerCount: fertilizerCount,
-                )),
+                MaterialPageRoute(builder: (context) => const ShopPage()),
               ),
               isSelected: false,
             ),
@@ -785,13 +620,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               label: 'Bag',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BagPage(
-                  leafyHearts: leafyHeartsCount,
-                  moodLog: moodLog,
-                  waterCount: waterCount,
-                  fertilizerCount: fertilizerCount,
-                  onItemUsed: _handleItemUsed,
-                )),
+                MaterialPageRoute(builder: (context) => const BagPage()),
               ),
               isSelected: false,
             ),

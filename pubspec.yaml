@@ -14,6 +14,8 @@ dependencies:
   intl: ^0.18.0
   cupertino_icons: ^1.0.8
   fl_chart: ^0.65.0  # Add this line
+  provider: ^6.1.1
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'screens/home_page.dart';
+import 'package:provider/provider.dart';
+import 'providers/item_state.dart';
 
 void main() {
-  runApp(OfficeLeafyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ItemState(),
+      child: const OfficeLeafyApp(),
+    ),
+  );
 }
 
 class OfficeLeafyApp extends StatelessWidget {
