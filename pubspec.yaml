@@ -1,0 +1,47 @@
+name: office_leafy
+description: A simple app to grow a virtual plant, track moods, and provide workplace companionship.
+
+publish_to: 'none' # Prevents accidental publishing to pub.dev.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.18.0
+  cupertino_icons: ^1.0.8
+  fl_chart: ^0.65.0  # Add this line
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/plants/
+    # Base plant stages
+    - assets/plants/stage1.png
+    - assets/plants/stage2.png
+    # Happy emotion variants
+    - assets/plants/stage1_happy.png
+    - assets/plants/stage2_happy.png
+    # Excited emotion variants
+    - assets/plants/stage1_excited.png
+    - assets/plants/stage2_excited.png
+    # Loved emotion variants
+    - assets/plants/stage1_loved.png
+    - assets/plants/stage2_loved.png
+    # Sad emotion variants
+    - assets/plants/stage1_sad.png
+    - assets/plants/stage2_sad.png
+    # Stressed emotion variants
+    - assets/plants/stage1_stressed.png
+    - assets/plants/stage2_stressed.png
+
+  
