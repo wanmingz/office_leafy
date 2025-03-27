@@ -14,27 +14,43 @@ class BagPage extends StatelessWidget {
     if (itemCount == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${item == 'Water' ? '水' : '肥料'}数量不足！'),
+          content: Text(
+            item == 'Water' 
+                ? 'No water available' 
+                : 'No fertilizer available',
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    String itemName = item == 'Water' ? '水' : '肥料';
+    String itemName = item == 'Water' ? 'Water' : 'Fertilizer';
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('使用$itemName'),
+        title: Text(
+          itemName,
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('确定要给植物使用$itemName吗？'),
+            Text(
+              'Are you sure you want to use $itemName?',
+              style: const TextStyle(
+                color: Color(0xFF1B5E20),
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
-              '剩余数量: $itemCount',
+              'Remaining quantity: $itemCount',
               style: const TextStyle(
                 color: Color(0xFF1B5E20),
                 fontSize: 14,
@@ -45,9 +61,14 @@ class BagPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+              ),
+            ),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(context);
               if (item == 'Water') {
@@ -57,16 +78,23 @@ class BagPage extends StatelessWidget {
               }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('成功给植物使用了$itemName！'),
+                  content: Text(
+                    item == 'Water'
+                        ? 'Water used successfully'
+                        : 'Fertilizer used successfully',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   backgroundColor: const Color(0xFF1B5E20),
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1B5E20),
-              foregroundColor: Colors.white,
+            child: const Text(
+              'Use',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            child: const Text('使用'),
           ),
         ],
       ),

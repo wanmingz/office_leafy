@@ -6,8 +6,23 @@ import 'shop_page.dart';
 import 'bag_page.dart';
 
 
-class EmotionTrendPage extends StatelessWidget {
+class EmotionTrendPage extends StatefulWidget {
   const EmotionTrendPage({super.key});
+
+  @override
+  State<EmotionTrendPage> createState() => _EmotionTrendPageState();
+}
+
+class _EmotionTrendPageState extends State<EmotionTrendPage> {
+  String _selectedMonth = 'This Month';
+  final List<String> _months = [
+    'This Month',
+    'Last Month',
+    'Previous Month',
+    'Last 3 Months',
+    'Last 6 Months',
+    'Last 12 Months',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +133,58 @@ class EmotionTrendPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // 添加月份选择器
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Time Range',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      DropdownButton<String>(
+                        value: _selectedMonth,
+                        items: _months.map((String month) {
+                          return DropdownMenuItem<String>(
+                            value: month,
+                            child: Text(
+                              month,
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedMonth = newValue;
+                            });
+                          }
+                        },
+                        underline: Container(),
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 // 心情分布卡片
                 Card(
                   elevation: 4,

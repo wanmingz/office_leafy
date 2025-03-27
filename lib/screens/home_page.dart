@@ -4,6 +4,7 @@ import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import 'bag_page.dart';
 import '../providers/item_state.dart';
+import 'plant_growth_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -307,6 +308,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.eco),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PlantGrowthPage()),
+              );
+            },
           ),
         ],
       ),
