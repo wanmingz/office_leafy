@@ -317,18 +317,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(
-              Icons.settings,
-              color: Color(0xFF1B5E20),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingPage()),
-              );
-            },
-          ),
         ],
       ),
       body: Container(
@@ -573,8 +561,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          _buildMoodButton("Excited", Icons.celebration, Colors.orange),
                           _buildMoodButton("Happy", Icons.sentiment_very_satisfied, Colors.amber),
+                          _buildMoodButton("Excited", Icons.celebration, Colors.orange),
                           _buildMoodButton("Loved", Icons.favorite, Colors.red),
                           _buildMoodButton("Okay", Icons.sentiment_satisfied, Colors.green),
                           _buildMoodButton("Sad", Icons.sentiment_dissatisfied, Colors.blue),

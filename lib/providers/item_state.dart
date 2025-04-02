@@ -174,6 +174,21 @@ class ItemState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 重置所有数据
+  void resetAllData() {
+    _waterCount = 0;
+    _fertilizerCount = 0;
+    _leafyHeartsCount = 0;
+    _plantStage = 1;
+    _waterUsed = 0;
+    _fertilizerUsed = 0;
+    _lastGrowthUpdate = DateTime.now();
+    _moodLog.clear();
+    _currentEmotion = "Happy";
+    _saveData();
+    notifyListeners();
+  }
+
   // 检查每日记录限制
   bool canRecordMoodToday() {
     final today = DateTime.now();
@@ -184,23 +199,5 @@ class ItemState extends ChangeNotifier {
     }).length;
     
     return todayRecords <= 3;
-  }
-
-  // 重置所有数据
-  Future<void> resetAllData() async {
-    _waterCount = 0;
-    _fertilizerCount = 0;
-    _leafyHeartsCount = 0;
-    _plantStage = 1;
-    _waterUsed = 0;
-    _fertilizerUsed = 0;
-    _lastGrowthUpdate = DateTime.now();
-    _moodLog.clear();
-    _currentEmotion = "Happy";
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // 清除所有存储的数据
-    
-    notifyListeners();
   }
 } 
