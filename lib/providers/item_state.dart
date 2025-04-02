@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class ItemState extends ChangeNotifier {
   // 基础数据
@@ -11,6 +13,60 @@ class ItemState extends ChangeNotifier {
   DateTime _lastGrowthUpdate = DateTime.now();
   final Map<DateTime, Map<String, dynamic>> _moodLog = {};
   String _currentEmotion = "Happy";
+
+  // 构造函数
+  ItemState() {
+    _loadData();
+  }
+
+  // 加载保存的数据
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    _waterCount = prefs.getInt('waterCount') ?? 0;
+    _fertilizerCount = prefs.getInt('fertilizerCount') ?? 0;
+    _leafyHeartsCount = prefs.getInt('leafyHeartsCount') ?? 0;
+    _plantStage = prefs.getInt('plantStage') ?? 1;
+    _waterUsed = prefs.getInt('waterUsed') ?? 0;
+    _fertilizerUsed = prefs.getInt('fertilizerUsed') ?? 0;
+    _lastGrowthUpdate = DateTime.fromMillisecondsSinceEpoch(
+      prefs.getInt('lastGrowthUpdate') ?? DateTime.now().millisecondsSinceEpoch
+    );
+    _currentEmotion = prefs.getString('currentEmotion') ?? "Happy";
+
+    // 加载心情日志
+    String? moodLogJson = prefs.getString('moodLog');
+    if (moodLogJson != null) {
+      Map<String, dynamic> decodedLog = json.decode(moodLogJson);
+      _moodLog.clear();
+      decodedLog.forEach((key, value) {
+        _moodLog[DateTime.parse(key)] = Map<String, dynamic>.from(value);
+      });
+    }
+
+    notifyListeners();
+  }
+
+  // 保存数据
+  Future<void> _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    await prefs.setInt('waterCount', _waterCount);
+    await prefs.setInt('fertilizerCount', _fertilizerCount);
+    await prefs.setInt('leafyHeartsCount', _leafyHeartsCount);
+    await prefs.setInt('plantStage', _plantStage);
+    await prefs.setInt('waterUsed', _waterUsed);
+    await prefs.setInt('fertilizerUsed', _fertilizerUsed);
+    await prefs.setInt('lastGrowthUpdate', _lastGrowthUpdate.millisecondsSinceEpoch);
+    await prefs.setString('currentEmotion', _currentEmotion);
+
+    // 保存心情日志
+    Map<String, dynamic> encodedLog = {};
+    _moodLog.forEach((key, value) {
+      encodedLog[key.toIso8601String()] = value;
+    });
+    await prefs.setString('moodLog', json.encode(encodedLog));
+  }
 
   // Getters
   int get waterCount => _waterCount;
@@ -34,6 +90,7 @@ class ItemState extends ChangeNotifier {
         _plantStage = 2;
       }
       
+      _saveData();
       notifyListeners();
     }
   }
@@ -48,34 +105,40 @@ class ItemState extends ChangeNotifier {
         _plantStage = 2;
       }
       
+      _saveData();
       notifyListeners();
     }
   }
 
   void purchaseWater() {
     _waterCount++;
+    _saveData();
     notifyListeners();
   }
 
   void purchaseFertilizer() {
     _fertilizerCount++;
+    _saveData();
     notifyListeners();
   }
 
   // 心形叶子相关方法
   void updateLeafyHearts(int count) {
     _leafyHeartsCount = count;
+    _saveData();
     notifyListeners();
   }
 
   void addLeafyHeart() {
     _leafyHeartsCount++;
+    _saveData();
     notifyListeners();
   }
 
   void useLeafyHearts(int amount) {
     if (_leafyHeartsCount >= amount) {
       _leafyHeartsCount -= amount;
+      _saveData();
       notifyListeners();
     }
   }
@@ -88,6 +151,7 @@ class ItemState extends ChangeNotifier {
     if (daysSinceLastGrowth >= 3 && _plantStage < 2) {
       _plantStage++;
       _lastGrowthUpdate = now;
+      _saveData();
       notifyListeners();
     }
   }
@@ -100,11 +164,13 @@ class ItemState extends ChangeNotifier {
       'note': note,
     };
     _currentEmotion = mood;
+    _saveData();
     notifyListeners();
   }
 
   void deleteMood(DateTime date) {
     _moodLog.remove(date);
+    _saveData();
     notifyListeners();
   }
 

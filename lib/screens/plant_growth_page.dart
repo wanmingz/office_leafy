@@ -1,9 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/item_state.dart';
+import 'emotion_trend_page.dart';
+import 'shop_page.dart';
 
 class PlantGrowthPage extends StatelessWidget {
   const PlantGrowthPage({super.key});
+
+  Widget _buildNavButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+    required bool isSelected,
+  }) {
+    return TextButton(
+      onPressed: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            size: 24,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +47,29 @@ class PlantGrowthPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Plant Growth'),
         centerTitle: true,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.favorite,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${itemState.leafyHeartsCount}',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -105,6 +161,69 @@ class PlantGrowthPage extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              blurRadius: 12,
+              offset: const Offset(0, -6),
+              spreadRadius: 2,
+            )
+          ],
+        ),
+        padding: EdgeInsets.only(
+          top: 12,
+          bottom: MediaQuery.of(context).padding.bottom + 12,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavButton(
+              context: context,
+              icon: Icons.home,
+              label: 'Home',
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              isSelected: false,
+            ),
+            _buildNavButton(
+              context: context,
+              icon: Icons.insights,
+              label: 'Trends',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
+                );
+              },
+              isSelected: false,
+            ),
+            _buildNavButton(
+              context: context,
+              icon: Icons.shopping_bag,
+              label: 'Shop',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShopPage()),
+                );
+              },
+              isSelected: false,
+            ),
+            _buildNavButton(
+              context: context,
+              icon: Icons.local_florist,
+              label: 'Plant',
+              onPressed: () {},
+              isSelected: true,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -171,17 +290,16 @@ class PlantGrowthPage extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
+                title == 'Water Requirements' ? 'Water' : 'Fertilizer',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
               Text(
                 description,
                 style: TextStyle(
@@ -200,14 +318,14 @@ class PlantGrowthPage extends StatelessWidget {
       case 1:
         final remainingWater = 2 - itemState.waterUsed;
         return remainingWater > 0
-            ? 'Need $remainingWater more water(s)'
-            : 'Water requirements met';
+            ? '$remainingWater more'
+            : 'Done';
       case 2:
-        return 'Water requirements met';
+        return 'Done';
       case 3:
-        return 'Water requirements met';
+        return 'Done';
       default:
-        return 'Water requirements met';
+        return 'Done';
     }
   }
 
@@ -216,14 +334,14 @@ class PlantGrowthPage extends StatelessWidget {
       case 1:
         final remainingFertilizer = 1 - itemState.fertilizerUsed;
         return remainingFertilizer > 0
-            ? 'Need $remainingFertilizer more fertilizer(s)'
-            : 'Fertilizer requirements met';
+            ? '$remainingFertilizer more'
+            : 'Done';
       case 2:
-        return 'Fertilizer requirements met';
+        return 'Done';
       case 3:
-        return 'Fertilizer requirements met';
+        return 'Done';
       default:
-        return 'Fertilizer requirements met';
+        return 'Done';
     }
   }
 } 

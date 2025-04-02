@@ -16,6 +16,7 @@ dependencies:
   fl_chart: ^0.65.0  # Add this line
   provider: ^6.1.1
   table_calendar: ^3.0.9
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -39,11 +40,15 @@ flutter:
     # Loved emotion variants
     - assets/plants/stage1_loved.png
     - assets/plants/stage2_loved.png
+    # Okay emotion variants
+    - assets/plants/stage1_okay.png
+    - assets/plants/stage2_okay.png
     # Sad emotion variants
     - assets/plants/stage1_sad.png
     - assets/plants/stage2_sad.png
     # Stressed emotion variants
     - assets/plants/stage1_stressed.png
     - assets/plants/stage2_stressed.png
+    
 
   

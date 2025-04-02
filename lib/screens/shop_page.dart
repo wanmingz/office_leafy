@@ -2,70 +2,156 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
-import 'bag_page.dart';
+import 'plant_growth_page.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
 
-  void _handlePurchase(BuildContext context, String item, int price) {
+  void _showPurchaseDialog(BuildContext context, String itemType) {
     final itemState = context.read<ItemState>();
-    
-    if (itemState.leafyHeartsCount >= price) {
-      itemState.useLeafyHearts(price);
-      if (item == 'Water') {
-        itemState.purchaseWater();
-      } else if (item == 'Fertilizer') {
-        itemState.purchaseFertilizer();
-      }
-      
+    final leafyHeartsCount = itemState.leafyHeartsCount;
+    final cost = itemType == 'water' ? 1 : 2;
+
+    if (leafyHeartsCount < cost) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Successfully purchased $item!'),
-          backgroundColor: const Color(0xFF1B5E20),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Not enough Leafy Hearts!'),
+          content: Text(
+            'Not enough Leafy Hearts to purchase ${itemType}!',
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.red,
         ),
       );
+      return;
     }
-  }
 
-  void _showPurchaseDialog(BuildContext context, String item, int price) {
-    final itemState = context.read<ItemState>();
-    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Purchase $item?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('This will cost $price Leafy Heart${price > 1 ? 's' : ''}.'),
-            const SizedBox(height: 8),
-            Text('You have ${itemState.leafyHeartsCount} Leafy Heart${itemState.leafyHeartsCount > 1 ? 's' : ''}.'),
-          ],
+        title: Text(
+          'Purchase ${itemType == 'water' ? 'Water' : 'Fertilizer'}',
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Cost: $cost Leafy Heart${cost > 1 ? 's' : ''}',
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _handlePurchase(context, item, price);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1B5E20),
-              foregroundColor: Colors.white,
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+              ),
             ),
-            child: const Text('Purchase'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (itemType == 'water') {
+                itemState.purchaseWater();
+                itemState.useLeafyHearts(1);
+              } else {
+                itemState.purchaseFertilizer();
+                itemState.useLeafyHearts(2);
+              }
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${itemType == 'water' ? 'Water' : 'Fertilizer'} purchased successfully!',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: const Color(0xFF1B5E20),
+                ),
+              );
+            },
+            child: const Text(
+              'Purchase',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUseItemDialog(BuildContext context, String itemType) {
+    final itemState = context.read<ItemState>();
+    final count = itemType == 'water' ? itemState.waterCount : itemState.fertilizerCount;
+    
+    if (count <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No ${itemType} available',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Use ${itemType == 'water' ? 'Water' : 'Fertilizer'}',
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to use ${itemType}?',
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              if (itemType == 'water') {
+                itemState.useWater();
+              } else {
+                itemState.useFertilizer();
+              }
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${itemType} used successfully',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: const Color(0xFF1B5E20),
+                ),
+              );
+            },
+            child: const Text(
+              'Use',
+              style: TextStyle(
+                color: Color(0xFF1B5E20),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -75,19 +161,12 @@ class ShopPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemState = context.watch<ItemState>();
-    
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Shop',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Color(0xFF1B5E20),
-          ),
-        ),
-        backgroundColor: const Color(0xFFFFFCF5),
-        elevation: 0,
+        title: const Text('Shop & Bag'),
+        centerTitle: true,
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
@@ -95,14 +174,14 @@ class ShopPage extends StatelessWidget {
               children: [
                 Icon(
                   Icons.favorite,
-                  color: const Color(0xFF1B5E20),
+                  color: colorScheme.primary,
                   size: 20,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${itemState.leafyHeartsCount}',
-                  style: const TextStyle(
-                    color: Color(0xFF1B5E20),
+                  style: TextStyle(
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -112,40 +191,345 @@ class ShopPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFFCF5),
-              Color(0xFFFFFCF5),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Shop Section
+              Text(
+                'Shop',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Water
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.water_drop,
+                                  color: Colors.blue,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Water',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'You have: ${itemState.waterCount}',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Price: ',
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.favorite,
+                                      color: colorScheme.primary,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '1',
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () => _showPurchaseDialog(context, 'water'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text('Buy'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Fertilizer
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.eco,
+                                  color: Colors.green,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Fertilizer',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'You have: ${itemState.fertilizerCount}',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Price: ',
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.favorite,
+                                      color: colorScheme.primary,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '2',
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () => _showPurchaseDialog(context, 'fertilizer'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text('Buy'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Bag Section
+              Text(
+                'Your Items',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Water
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.water_drop,
+                                  color: Colors.blue,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Water',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Available: ${itemState.waterCount}',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _showUseItemDialog(context, 'water'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text('Use'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Fertilizer
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.eco,
+                                  color: Colors.green,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Fertilizer',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Available: ${itemState.fertilizerCount}',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _showUseItemDialog(context, 'fertilizer'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text('Use'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildShopItem(
-              context,
-              'Water',
-              'Give your plant some water',
-              Icons.water_drop,
-              Colors.blue,
-              1,
-              itemState.waterCount,
-            ),
-            const SizedBox(height: 16),
-            _buildShopItem(
-              context,
-              'Fertilizer',
-              'Help your plant grow faster',
-              Icons.eco,
-              Colors.green,
-              2,
-              itemState.fertilizerCount,
-            ),
-          ],
         ),
       ),
       bottomNavigationBar: Container(
@@ -181,10 +565,12 @@ class ShopPage extends StatelessWidget {
               context: context,
               icon: Icons.insights,
               label: 'Trends',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
+                );
+              },
               isSelected: false,
             ),
             _buildNavButton(
@@ -196,127 +582,17 @@ class ShopPage extends StatelessWidget {
             ),
             _buildNavButton(
               context: context,
-              icon: Icons.backpack,
-              label: 'Bag',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const BagPage()),
-              ),
+              icon: Icons.local_florist,
+              label: 'Plant',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PlantGrowthPage()),
+                );
+              },
               isSelected: false,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildShopItem(
-    BuildContext context,
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-    int price,
-    int count,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-            spreadRadius: 2,
-          )
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showPurchaseDialog(context, title, price),
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B5E20),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1B5E20).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.favorite,
-                            color: const Color(0xFF1B5E20),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$price',
-                            style: const TextStyle(
-                              color: Color(0xFF1B5E20),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'You have: x$count',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: color,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -326,50 +602,29 @@ class ShopPage extends StatelessWidget {
     required BuildContext context,
     required IconData icon,
     required String label,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     required bool isSelected,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 24,
-                color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                shadows: [
-                  Shadow(
-                    color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  )
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                  shadows: [
-                    Shadow(
-                      color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    )
-                  ],
-                ),
-              ),
-            ],
+    return TextButton(
+      onPressed: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            size: 24,
           ),
-        ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }

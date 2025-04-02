@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
-import 'bag_page.dart';
 import '../providers/item_state.dart';
 import 'plant_growth_page.dart';
 
@@ -39,6 +38,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       "Your presence makes a difference! 💫",
       "You're surrounded by love! 💖",
       "You deserve all the love! 💕"
+    ],
+    'Okay': [
+      "Every day is a new opportunity! 🌱",
+      "Small steps lead to big changes! 🚶",
+      "You're doing just fine! 👍",
+      "Keep moving forward! 🎯"
     ],
     'Sad': [
       "It's okay to feel this way 💝",
@@ -252,6 +257,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case 'Happy': return Icons.sentiment_very_satisfied;
       case 'Excited': return Icons.celebration;
       case 'Loved': return Icons.favorite;
+      case 'Okay': return Icons.sentiment_satisfied;
       case 'Sad': return Icons.sentiment_dissatisfied;
       case 'Stressed': return Icons.psychology;
       default: return Icons.emoji_emotions;
@@ -263,6 +269,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case 'Happy': return Colors.amber;
       case 'Excited': return Colors.orange;
       case 'Loved': return Colors.red;
+      case 'Okay': return Colors.green;
       case 'Sad': return Colors.blue;
       case 'Stressed': return Colors.purple;
       default: return Colors.grey;
@@ -308,15 +315,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ],
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.eco),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PlantGrowthPage()),
-              );
-            },
           ),
         ],
       ),
@@ -565,6 +563,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           _buildMoodButton("Happy", Icons.sentiment_very_satisfied, Colors.amber),
                           _buildMoodButton("Excited", Icons.celebration, Colors.orange),
                           _buildMoodButton("Loved", Icons.favorite, Colors.red),
+                          _buildMoodButton("Okay", Icons.sentiment_satisfied, Colors.green),
                           _buildMoodButton("Sad", Icons.sentiment_dissatisfied, Colors.blue),
                           _buildMoodButton("Stressed", Icons.psychology, Colors.purple),
                         ],
@@ -583,7 +582,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               blurRadius: 12,
               offset: const Offset(0, -6),
               spreadRadius: 2,
@@ -601,37 +600,45 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               context: context,
               icon: Icons.home,
               label: 'Home',
-              onPressed: null,
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
               isSelected: true,
             ),
             _buildNavButton(
               context: context,
               icon: Icons.insights,
               label: 'Trends',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EmotionTrendPage()),
+                );
+              },
               isSelected: false,
             ),
             _buildNavButton(
               context: context,
               icon: Icons.shopping_bag,
               label: 'Shop',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ShopPage()),
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShopPage()),
+                );
+              },
               isSelected: false,
             ),
             _buildNavButton(
               context: context,
-              icon: Icons.backpack,
-              label: 'Bag',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const BagPage()),
-              ),
+              icon: Icons.local_florist,
+              label: 'Plant',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PlantGrowthPage()),
+                );
+              },
               isSelected: false,
             ),
           ],

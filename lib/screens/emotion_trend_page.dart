@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/item_state.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'shop_page.dart';
-import 'bag_page.dart';
+import 'home_page.dart';
+import 'plant_growth_page.dart';
 
 
 class EmotionTrendPage extends StatefulWidget {
@@ -320,7 +321,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               blurRadius: 12,
               offset: const Offset(0, -6),
               spreadRadius: 2,
@@ -354,20 +355,24 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
               context: context,
               icon: Icons.shopping_bag,
               label: 'Shop',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ShopPage()),
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShopPage()),
+                );
+              },
               isSelected: false,
             ),
             _buildNavButton(
               context: context,
-              icon: Icons.backpack,
-              label: 'Bag',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const BagPage()),
-              ),
+              icon: Icons.local_florist,
+              label: 'Plant',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PlantGrowthPage()),
+                );
+              },
               isSelected: false,
             ),
           ],
