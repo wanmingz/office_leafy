@@ -16,6 +16,7 @@ class EmotionTrendPage extends StatefulWidget {
 class _EmotionTrendPageState extends State<EmotionTrendPage> {
   String _selectedMonth = 'This Month';
   final List<String> _months = [
+    'This Week',
     'This Month',
     'Last Month',
     'Previous Month',
@@ -33,7 +34,38 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
 
     // 按日期对心情数据进行分组
     Map<DateTime, List<Map<String, dynamic>>> groupedMoodData = {};
+    DateTime now = DateTime.now();
+    DateTime startDate;
+
+    // 根据选择的时间范围设置开始日期
+    switch (_selectedMonth) {
+      case 'This Week':
+        startDate = now.subtract(Duration(days: now.weekday - 1));
+        break;
+      case 'This Month':
+        startDate = DateTime(now.year, now.month, 1);
+        break;
+      case 'Last Month':
+        startDate = DateTime(now.year, now.month - 1, 1);
+        break;
+      case 'Previous Month':
+        startDate = DateTime(now.year, now.month - 2, 1);
+        break;
+      case 'Last 3 Months':
+        startDate = DateTime(now.year, now.month - 2, 1);
+        break;
+      case 'Last 6 Months':
+        startDate = DateTime(now.year, now.month - 5, 1);
+        break;
+      case 'Last 12 Months':
+        startDate = DateTime(now.year, now.month - 11, 1);
+        break;
+      default:
+        startDate = DateTime(now.year, now.month, 1);
+    }
+
     for (var entry in moodLog.entries) {
+      if (entry.key.isBefore(startDate)) continue;
       DateTime date = DateTime(entry.key.year, entry.key.month, entry.key.day);
       if (!groupedMoodData.containsKey(date)) {
         groupedMoodData[date] = [];
@@ -47,38 +79,21 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
 
     // 计算每种心情的出现次数
     Map<String, int> moodCounts = {
-      'Happy': 0,
       'Excited': 0,
+      'Happy': 0,
       'Loved': 0,
+      'Okay': 0,
       'Sad': 0,
       'Stressed': 0,
     };
 
-    moodLog.values.forEach((moodData) {
+    for (var moodData in moodLog.values) {
       String mood = moodData['mood'] as String;
       moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
-    });
+    }
 
     // 计算总心情记录数
     int totalMoods = moodCounts.values.fold(0, (sum, count) => sum + count);
-
-    // 准备饼图数据
-    List<PieChartSectionData> pieChartData = moodCounts.entries.map((entry) {
-      Color color = _getMoodColor(entry.key);
-      double percentage = totalMoods > 0 ? (entry.value / totalMoods) * 100 : 0;
-      
-      return PieChartSectionData(
-        color: color.withOpacity(0.8),
-        value: entry.value.toDouble(),
-        title: '${percentage.toStringAsFixed(1)}%',
-        radius: 80,
-        titleStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      );
-    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -97,9 +112,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
             margin: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.favorite,
-                  color: const Color(0xFF1B5E20),
+                  color: Color(0xFF1B5E20),
                   size: 20,
                 ),
                 const SizedBox(width: 4),
@@ -207,12 +222,79 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                         SizedBox(
                           height: 200,
                           child: totalMoods > 0
-                              ? PieChart(
-                                  PieChartData(
-                                    sections: pieChartData,
-                                    sectionsSpace: 2,
-                                    centerSpaceRadius: 0,
-                                    startDegreeOffset: -90,
+                              ? BarChart(
+                                  BarChartData(
+                                    alignment: BarChartAlignment.spaceAround,
+                                    maxY: 100,
+                                    barGroups: moodCounts.entries.map((entry) {
+                                      double percentage = (entry.value / totalMoods) * 100;
+                                      return BarChartGroupData(
+                                        x: moodCounts.keys.toList().indexOf(entry.key),
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: percentage,
+                                            color: _getMoodColor(entry.key).withOpacity(0.8),
+                                            width: 20,
+                                            borderRadius: BorderRadius.circular(4),
+                                            backDrawRodData: BackgroundBarChartRodData(
+                                              show: true,
+                                              color: Colors.grey.withOpacity(0.1),
+                                              toY: 100,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                                    titlesData: FlTitlesData(
+                                      show: true,
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget: (value, meta) {
+                                            String mood = moodCounts.keys.elementAt(value.toInt());
+                                            return Padding(
+                                              padding: const EdgeInsets.only(top: 8.0),
+                                              child: Text(
+                                                mood,
+                                                style: TextStyle(
+                                                  color: _getMoodColor(mood),
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          reservedSize: 40,
+                                          getTitlesWidget: (value, meta) {
+                                            return Text(
+                                              '${value.toInt()}%',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 10,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      topTitles: AxisTitles(
+                                        sideTitles: SideTitles(showTitles: false),
+                                      ),
+                                      rightTitles: AxisTitles(
+                                        sideTitles: SideTitles(showTitles: false),
+                                      ),
+                                    ),
+                                    gridData: FlGridData(
+                                      show: false,
+                                    ),
+                                    borderData: FlBorderData(
+                                      show: false,
+                                    ),
                                   ),
                                 )
                               : Center(
@@ -243,7 +325,112 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
+                // 添加折线图
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, bottom: 16),
+                      child: Text(
+                        'Mood Trend',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 200,
+                      child: totalMoods > 0
+                          ? LineChart(
+                              LineChartData(
+                                gridData: FlGridData(show: false),
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, meta) {
+                                        if (value.toInt() >= groupedMoodData.length) return const Text('');
+                                        DateTime date = groupedMoodData.keys.elementAt(value.toInt());
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0),
+                                          child: Text(
+                                            _formatDate(date),
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 10,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 40,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 10,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots: groupedMoodData.entries.map((entry) {
+                                      double averageMoodValue = 0;
+                                      if (entry.value.isNotEmpty) {
+                                        averageMoodValue = entry.value.map((moodData) {
+                                          return _getMoodValue(moodData['mood'] as String);
+                                        }).reduce((a, b) => a + b) / entry.value.length;
+                                      }
+                                      return FlSpot(
+                                        groupedMoodData.keys.toList().indexOf(entry.key).toDouble(),
+                                        averageMoodValue,
+                                      );
+                                    }).toList(),
+                                    isCurved: true,
+                                    color: Theme.of(context).colorScheme.primary,
+                                    barWidth: 3,
+                                    isStrokeCapRound: true,
+                                    dotData: FlDotData(show: true),
+                                    belowBarData: BarAreaData(
+                                      show: true,
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                'No mood data yet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface.withOpacity(0.6),
+                                ),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 // 心情历史记录
                 Card(
                   elevation: 4,
@@ -309,6 +496,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -463,13 +651,44 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
               ],
             ),
           ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            color: Colors.red,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Delete Mood Record'),
+                    content: const Text('Are you sure you want to delete this mood record?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          final itemState = context.read<ItemState>();
+                          itemState.deleteMood(timestamp);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     );
   }
 
   String _formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return '${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   String _formatTime(DateTime time) {
@@ -478,35 +697,37 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
 
   Color _getMoodColor(String mood) {
     switch (mood) {
-      case 'Happy':
-        return Colors.amber;
-      case 'Excited':
-        return Colors.orange;
-      case 'Loved':
-        return Colors.red;
-      case 'Sad':
-        return Colors.blue;
-      case 'Stressed':
-        return Colors.purple;
-      default:
-        return Colors.grey;
+      case 'Excited': return Colors.orange;
+      case 'Happy': return Colors.amber;
+      case 'Loved': return Colors.red;
+      case 'Okay': return Colors.green;
+      case 'Sad': return Colors.blue;
+      case 'Stressed': return Colors.purple;
+      default: return Colors.grey;
     }
   }
 
   IconData _getMoodIcon(String mood) {
     switch (mood) {
-      case 'Happy':
-        return Icons.sentiment_very_satisfied;
-      case 'Excited':
-        return Icons.celebration;
-      case 'Loved':
-        return Icons.favorite;
-      case 'Sad':
-        return Icons.sentiment_dissatisfied;
-      case 'Stressed':
-        return Icons.psychology;
-      default:
-        return Icons.emoji_emotions;
+      case 'Excited': return Icons.celebration;
+      case 'Happy': return Icons.sentiment_very_satisfied;
+      case 'Loved': return Icons.favorite;
+      case 'Okay': return Icons.sentiment_satisfied;
+      case 'Sad': return Icons.sentiment_dissatisfied;
+      case 'Stressed': return Icons.psychology;
+      default: return Icons.emoji_emotions;
+    }
+  }
+
+  double _getMoodValue(String mood) {
+    switch (mood) {
+      case 'Excited': return 5.0;
+      case 'Happy': return 4.0;
+      case 'Loved': return 4.0;
+      case 'Okay': return 3.0;
+      case 'Sad': return 2.0;
+      case 'Stressed': return 1.0;
+      default: return 0.0;
     }
   }
 

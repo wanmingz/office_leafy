@@ -22,17 +22,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // Updated comforting quotes with mood-specific messages
   Map<String, List<String>> comfortingQuotes = {
-    'Happy': [
-      "Your happiness is contagious! 🌟",
-      "Keep spreading those positive vibes! ✨",
-      "Your joy makes the world brighter! 🌈",
-      "Stay as amazing as you are! 🌺"
-    ],
     'Excited': [
       "Your enthusiasm is inspiring! 🚀",
       "Keep that energy flowing! ⚡",
       "Your excitement is contagious! 🎉",
       "Let's make this day amazing! 🌟"
+    ],
+    'Happy': [
+      "Your happiness is contagious! 🌟",
+      "Keep spreading those positive vibes! ✨",
+      "Your joy makes the world brighter! 🌈",
+      "Stay as amazing as you are! 🌺"
     ],
     'Loved': [
       "You are deeply appreciated! 💝",
@@ -154,16 +154,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          content: Column(
+          content: const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.favorite,
-                color: const Color(0xFF1B5E20),
+                color: Color(0xFF1B5E20),
                 size: 48,
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Congratulations!',
                 style: TextStyle(
                   fontSize: 20,
@@ -171,8 +171,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   color: Color(0xFF1B5E20),
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: 8),
+              Text(
                 'You got 1 Leafy Heart!',
                 style: TextStyle(
                   fontSize: 16,
@@ -196,16 +196,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          content: Column(
+          content: const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.favorite,
-                color: const Color(0xFF1B5E20),
+                color: Color(0xFF1B5E20),
                 size: 48,
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Daily Limit Reached',
                 style: TextStyle(
                   fontSize: 20,
@@ -213,8 +213,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   color: Color(0xFF1B5E20),
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: 8),
+              Text(
                 'Your mood has been recorded, but you\'ve reached your daily limit of 3 Leafy Hearts. Your plant will be waiting for more love tomorrow!',
                 style: TextStyle(
                   fontSize: 16,
@@ -300,9 +300,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             margin: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.favorite,
-                  color: const Color(0xFF1B5E20),
+                  color: Color(0xFF1B5E20),
                   size: 20,
                 ),
                 const SizedBox(width: 4),
@@ -573,8 +573,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          _buildMoodButton("Happy", Icons.sentiment_very_satisfied, Colors.amber),
                           _buildMoodButton("Excited", Icons.celebration, Colors.orange),
+                          _buildMoodButton("Happy", Icons.sentiment_very_satisfied, Colors.amber),
                           _buildMoodButton("Loved", Icons.favorite, Colors.red),
                           _buildMoodButton("Okay", Icons.sentiment_satisfied, Colors.green),
                           _buildMoodButton("Sad", Icons.sentiment_dissatisfied, Colors.blue),
@@ -667,47 +667,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     required VoidCallback? onPressed,
     required bool isSelected,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 24,
-                color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                shadows: [
-                  Shadow(
-                    color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  )
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary,
-                  shadows: [
-                    Shadow(
-                      color: (isSelected ? const Color(0xFF1B5E20) : Theme.of(context).colorScheme.primary).withOpacity(0.2),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    )
-                  ],
-                ),
-              ),
-            ],
+    return TextButton(
+      onPressed: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            size: 24,
           ),
-        ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
