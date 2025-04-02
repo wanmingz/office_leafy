@@ -1,24 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "flutter pub get && flutter build web --release --web-renderer html",
-  "outputDirectory": "build/web",
   "public": true,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "builds": [
+    { "src": "build/web/**", "use": "@vercel/static" }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cross-Origin-Opener-Policy",
-          "value": "same-origin"
-        },
-        {
-          "key": "Cross-Origin-Embedder-Policy",
-          "value": "require-corp"
-        }
-      ]
-    }
+  "routes": [
+    { "src": "/(.*)", "dest": "/build/web/$1" },
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/build/web/index.html" }
   ]
 } 
