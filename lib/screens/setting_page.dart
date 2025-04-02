@@ -13,14 +13,14 @@ class SettingPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(
-          '重置所有数据',
+          'Reset All Data',
           style: TextStyle(
             color: Color(0xFF1B5E20),
             fontWeight: FontWeight.bold,
           ),
         ),
         content: const Text(
-          '您确定要重置所有数据吗？此操作无法撤销。',
+          'Are you sure you want to reset all data? This action cannot be undone.',
           style: TextStyle(
             color: Color(0xFF1B5E20),
           ),
@@ -29,7 +29,7 @@ class SettingPage extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text(
-              '取消',
+              'Cancel',
               style: TextStyle(
                 color: Color(0xFF1B5E20),
               ),
@@ -42,7 +42,7 @@ class SettingPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text(
-                    '所有数据已重置',
+                    'All data has been reset',
                     style: TextStyle(color: Colors.white),
                   ),
                   backgroundColor: Color(0xFF1B5E20),
@@ -50,7 +50,7 @@ class SettingPage extends StatelessWidget {
               );
             },
             child: const Text(
-              '重置',
+              'Reset',
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -99,7 +99,7 @@ class SettingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '设置',
+          'Settings',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -125,12 +125,12 @@ class SettingPage extends StatelessWidget {
               ),
             ),
             title: const Text(
-              '重置所有数据',
+              'Reset All Data',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: const Text('清除所有进度并重新开始'),
+            subtitle: const Text('Clear all progress and start over'),
             onTap: () => _showResetConfirmationDialog(context),
           ),
           const Divider(),
@@ -160,7 +160,7 @@ class SettingPage extends StatelessWidget {
             _buildNavButton(
               context: context,
               icon: Icons.home,
-              label: '主页',
+              label: 'Home',
               onPressed: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
@@ -169,7 +169,7 @@ class SettingPage extends StatelessWidget {
             _buildNavButton(
               context: context,
               icon: Icons.insights,
-              label: '趋势',
+              label: 'Trends',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -181,7 +181,7 @@ class SettingPage extends StatelessWidget {
             _buildNavButton(
               context: context,
               icon: Icons.shopping_bag,
-              label: '商店',
+              label: 'Shop',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -193,7 +193,7 @@ class SettingPage extends StatelessWidget {
             _buildNavButton(
               context: context,
               icon: Icons.local_florist,
-              label: '植物',
+              label: 'Plant',
               onPressed: () {
                 Navigator.push(
                   context,

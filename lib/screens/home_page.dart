@@ -317,6 +317,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
+          IconButton(
+            icon: const Icon(
+              Icons.settings,
+              color: Color(0xFF1B5E20),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingPage()),
+              );
+            },
+          ),
         ],
       ),
       body: Container(
