@@ -16,7 +16,7 @@ class ShopPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Not enough Leafy Hearts to purchase ${itemType}!',
+            'Not enough Leafy Hearts to purchase $itemType!',
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
@@ -92,7 +92,7 @@ class ShopPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'No ${itemType} available',
+            'No $itemType available',
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
@@ -112,7 +112,7 @@ class ShopPage extends StatelessWidget {
           ),
         ),
         content: Text(
-          'Are you sure you want to use ${itemType}?',
+          'Are you sure you want to use $itemType?',
           style: const TextStyle(
             color: Color(0xFF1B5E20),
           ),
@@ -138,7 +138,7 @@ class ShopPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${itemType} used successfully',
+                    '$itemType used successfully',
                     style: const TextStyle(color: Colors.white),
                   ),
                   backgroundColor: const Color(0xFF1B5E20),
