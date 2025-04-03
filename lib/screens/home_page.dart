@@ -585,14 +585,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                 ),
                 const SizedBox(height: 24),
-                // 添加版本号
-                Text(
-                  "Office Leafy v0.1 🌿 Updated 2025-04-02",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  textAlign: TextAlign.center,
+                // 添加版本号和版权信息
+                Column(
+                  children: [
+                    Text(
+                      "Office Leafy v0.1 🌿 Updated 2025-04-02",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "© 2025 Wanming Zhao. All rights reserved.",
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colorScheme.onSurface.withOpacity(0.4),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
               ],
