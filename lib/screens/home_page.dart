@@ -584,17 +584,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                // 添加版本号
-                Text(
-                  "Office Leafy v0.1 🌿 Updated 2025-04-02",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
               ],
             ),
           ),
