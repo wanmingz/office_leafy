@@ -584,8 +584,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ],
                   ),
                 ),
-<<<<<<< HEAD
-=======
                 const SizedBox(height: 24),
                 // 添加版本号
                 Text(
@@ -596,8 +594,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                   textAlign: TextAlign.center,
                 ),
+                Text(
+                  "© 2025 Wanming Zhao. All rights reserved.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 16),
->>>>>>> parent of f8dd859 (update copy right)
               ],
             ),
           ),

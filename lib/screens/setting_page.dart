@@ -134,7 +134,6 @@ class SettingPage extends StatelessWidget {
             onTap: () => _showResetConfirmationDialog(context),
           ),
           const Divider(),
-          // 可以在这里添加更多设置选项
         ],
       ),
       bottomNavigationBar: Container(
