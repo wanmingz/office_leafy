@@ -4,7 +4,6 @@ import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import 'plant_growth_page.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -64,23 +63,6 @@ class SettingPage extends StatelessWidget {
     );
   }
 
-  Future<void> _sendFeedback() async {
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'officeleafy@gmail.com',
-      queryParameters: {
-        'subject': 'Office Leafy Feedback',
-        'body': 'Hi Leafy,\n\nI would like to provide feedback about the app:\n\n'
-      }
-    );
-
-    try {
-      await launchUrl(emailLaunchUri);
-    } catch (e) {
-      debugPrint('Could not launch email: $e');
-    }
-  }
-
   Widget _buildNavButton({
     required BuildContext context,
     required IconData icon,
@@ -130,28 +112,6 @@ class SettingPage extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 16),
-          ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1B5E20).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.feedback,
-                color: Color(0xFF1B5E20),
-              ),
-            ),
-            title: const Text(
-              'Send Feedback',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: const Text('Help us improve Office Leafy'),
-            onTap: _sendFeedback,
-          ),
-          const Divider(),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
