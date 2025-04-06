@@ -384,7 +384,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                         x: sortedMoods.indexOf(mood),
                                         barRods: [
                                           BarChartRodData(
-                                            toY: percentage,
+                                            toY: percentage.roundToDouble(),
                                             color: _getMoodColor(mood).withOpacity(0.8),
                                             width: 20,
                                             borderRadius: BorderRadius.circular(4),
@@ -448,6 +448,26 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                     borderData: FlBorderData(
                                       show: false,
                                     ),
+                                    barTouchData: BarTouchData(
+                                      touchTooltipData: BarTouchTooltipData(
+                                        tooltipBgColor: Colors.white,
+                                        tooltipRoundedRadius: 8,
+                                        tooltipPadding: const EdgeInsets.all(8),
+                                        tooltipMargin: 8,
+                                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                          String mood = sortedMoods[group.x.toInt()];
+                                          int count = moodCounts[mood]!;
+                                          return BarTooltipItem(
+                                            '$count times',
+                                            GoogleFonts.nunito(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: _getMoodColor(mood),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 )
                               : Center(
@@ -461,22 +481,22 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                   ),
                                 ),
                         ),
-                        const SizedBox(height: 24),
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 8,
-                          alignment: WrapAlignment.center,
-                          children: moodCounts.entries.map((entry) {
-                            return _buildLegendItem(
-                              entry.key,
-                              entry.value,
-                              _getMoodColor(entry.key),
-                            );
-                          }).toList(),
-                        ),
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 24),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: moodCounts.entries.map((entry) {
+                    return _buildLegendItem(
+                      entry.key,
+                      entry.value,
+                      _getMoodColor(entry.key),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 16),
                 // 添加折线图
@@ -500,6 +520,8 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                           ? LineChart(
                               LineChartData(
                                 gridData: FlGridData(show: false),
+                                minY: 0,
+                                maxY: 5,
                                 titlesData: FlTitlesData(
                                   show: true,
                                   bottomTitles: AxisTitles(
@@ -508,18 +530,22 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                       getTitlesWidget: (value, meta) {
                                         if (value.toInt() >= groupedMoodData.length) return const Text('');
                                         DateTime date = groupedMoodData.keys.elementAt(value.toInt());
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
-                                          child: Text(
-                                            _formatDate(date),
-                                            style: GoogleFonts.nunito(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey,
+                                        // 只在偶数位置显示日期
+                                        if (value.toInt() % 2 == 0) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 8.0),
+                                            child: Text(
+                                              _formatDate(date),
+                                              style: GoogleFonts.nunito(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.grey,
+                                              ),
+                                              textAlign: TextAlign.center,
                                             ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        );
+                                          );
+                                        }
+                                        return const Text('');
                                       },
                                     ),
                                   ),
@@ -529,7 +555,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                       reservedSize: 40,
                                       getTitlesWidget: (value, meta) {
                                         return Text(
-                                          value.toInt().toString(),
+                                          value.toStringAsFixed(1),
                                           style: GoogleFonts.nunito(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w600,
@@ -572,6 +598,32 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                     ),
                                   ),
                                 ],
+                                lineTouchData: LineTouchData(
+                                  touchTooltipData: LineTouchTooltipData(
+                                    tooltipBgColor: Colors.white,
+                                    tooltipRoundedRadius: 8,
+                                    tooltipPadding: const EdgeInsets.all(8),
+                                    tooltipMargin: 8,
+                                    getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                                      return touchedBarSpots.map((barSpot) {
+                                        final date = groupedMoodData.keys.elementAt(barSpot.x.toInt());
+                                        final moods = groupedMoodData[date]!;
+                                        final averageScore = moods.map((moodData) {
+                                          return _getMoodValue(moodData['mood'] as String);
+                                        }).reduce((a, b) => a + b) / moods.length;
+                                        
+                                        return LineTooltipItem(
+                                          '${_formatDate(date)}\nAverage: ${averageScore.toStringAsFixed(1)}',
+                                          GoogleFonts.nunito(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+                                  ),
+                                ),
                               ),
                             )
                           : Center(
@@ -912,6 +964,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
       case 'Annoyed': return 1.5;
       default: return 0.0;
     }
+  }
+
+  String _getPercentageText(double percentage) {
+    return '${percentage.toStringAsFixed(0)}%';
   }
 
   Widget _buildNavButton({

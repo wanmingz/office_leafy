@@ -106,15 +106,6 @@ class SettingPage extends StatelessWidget {
                 color: const Color(0xFF1B5E20),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
-              'Author: Wanming Zhao',
-              style: GoogleFonts.nunito(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1B5E20),
-              ),
-            ),
           ],
         ),
         actions: [
