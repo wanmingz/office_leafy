@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PlantGrowthPage extends StatelessWidget {
   const PlantGrowthPage({super.key});
@@ -27,9 +28,9 @@ class PlantGrowthPage extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
             ),
           ),
@@ -45,7 +46,14 @@ class PlantGrowthPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plant Growth'),
+        title: Text(
+          'Plant Growth',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
         centerTitle: true,
         actions: [
           Container(
@@ -85,10 +93,10 @@ class PlantGrowthPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Current Growth Stage',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        'Growth Stage: ${itemState.plantGrowthStage}',
+                        style: GoogleFonts.nunito(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
                         ),
                       ),
@@ -131,9 +139,9 @@ class PlantGrowthPage extends StatelessWidget {
                     children: [
                       Text(
                         'Growth Requirements',
-                        style: TextStyle(
+                        style: GoogleFonts.nunito(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
                         ),
                       ),
@@ -258,7 +266,7 @@ class PlantGrowthPage extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           title,
-          style: TextStyle(
+          style: GoogleFonts.nunito(
             color: isActive ? colorScheme.primary : colorScheme.outline,
             fontWeight: FontWeight.bold,
           ),
@@ -295,14 +303,14 @@ class PlantGrowthPage extends StatelessWidget {
             children: [
               Text(
                 title == 'Water Requirements' ? 'Water' : 'Fertilizer',
-                style: const TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 description,
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -316,12 +324,15 @@ class PlantGrowthPage extends StatelessWidget {
   String _getWaterRequirement(ItemState itemState) {
     switch (itemState.plantGrowthStage) {
       case 1:
-        final remainingWater = 2 - itemState.waterUsed;
+        final remainingWater = 1 - itemState.waterUsed;
         return remainingWater > 0
             ? '$remainingWater more'
             : 'Done';
       case 2:
-        return 'Done';
+        final remainingWater = 5 - itemState.waterUsed;
+        return remainingWater > 0
+            ? '$remainingWater more'
+            : 'Done';
       case 3:
         return 'Done';
       default:
@@ -337,7 +348,10 @@ class PlantGrowthPage extends StatelessWidget {
             ? '$remainingFertilizer more'
             : 'Done';
       case 2:
-        return 'Done';
+        final remainingFertilizer = 3 - itemState.fertilizerUsed;
+        return remainingFertilizer > 0
+            ? '$remainingFertilizer more'
+            : 'Done';
       case 3:
         return 'Done';
       default:

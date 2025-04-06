@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import '../providers/item_state.dart';
@@ -107,34 +108,81 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         title: Row(
           children: [
             Icon(
               getMoodIcon(mood),
               color: getMoodColor(mood),
+              size: 28,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Text(
               'Add a note for "$mood"',
-              style: const TextStyle(fontSize: 18),
+              style: GoogleFonts.nunito(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
             ),
           ],
         ),
-        content: TextField(
-          controller: _noteController,
-          decoration: InputDecoration(
-            hintText: 'Why do you feel this way? (optional)',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: TextField(
+            controller: _noteController,
+            decoration: InputDecoration(
+              hintText: 'Why do you feel this way? (optional)',
+              hintStyle: GoogleFonts.nunito(
+                color: Colors.grey[400],
+                fontSize: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: const Color(0xFFE8F5E9),
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: const Color(0xFFE8F5E9),
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: const Color(0xFF1B5E20),
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              filled: true,
+              fillColor: const Color(0xFFE8F5E9).withOpacity(0.3),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            maxLines: 3,
+            style: GoogleFonts.nunito(
+              fontSize: 14,
+              color: const Color(0xFF1B5E20),
+            ),
           ),
-          maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -142,13 +190,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               recordMoodWithNote(mood, _noteController.text);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: getMoodColor(mood).withOpacity(0.8),
+              backgroundColor: const Color(0xFF1B5E20),
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Save'),
+            child: Text(
+              'Save',
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -168,7 +225,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          content: const Column(
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
@@ -179,17 +236,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               SizedBox(height: 16),
               Text(
                 'Congratulations!',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 'You got 1 Leafy Heart!',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
                 textAlign: TextAlign.center,
@@ -210,7 +268,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          content: const Column(
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
@@ -221,17 +279,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               SizedBox(height: 16),
               Text(
                 'Daily Limit Reached',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 'Your mood has been recorded, but you\'ve reached your daily limit of 3 Leafy Hearts. Your plant will be waiting for more love tomorrow!',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF1B5E20),
                 ),
                 textAlign: TextAlign.center,
@@ -299,10 +358,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Color _getScoreColor(double score, ColorScheme colorScheme) {
-    if (score >= 4.0) return Colors.orange; // 非常好
-    if (score >= 3.0) return Colors.green; // 好
-    if (score >= 2.0) return Colors.amber; // 一般
-    return Colors.blue; // 需要关注
+    if (score >= 3.0) {
+      // 暖色调
+      if (score >= 4.5) return Colors.deepOrange; // 非常好
+      if (score >= 4.0) return Colors.orange;     // 很好
+      return Colors.amber;                         // 好
+    } else {
+      // 冷色调
+      if (score >= 2.0) return Colors.blue;       // 一般
+      if (score >= 1.0) return Colors.indigo;     // 不太好
+      return Colors.purple;                        // 需要关注
+    }
   }
 
   double _getMoodValue(String mood) {
@@ -327,12 +393,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Office Leafy',
-          style: TextStyle(
+          style: GoogleFonts.baloo2(
+            fontSize: 32,
+            color: const Color(0xFF1B5E20),
+            letterSpacing: 0.5,
             fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Color(0xFF1B5E20),
           ),
         ),
         backgroundColor: const Color(0xFFFFFCF5),
@@ -350,10 +417,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 const SizedBox(width: 4),
                 Text(
                   '${itemState.leafyHeartsCount}',
-                  style: const TextStyle(
-                    color: Color(0xFF1B5E20),
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.nunito(
                     fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -451,7 +518,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       // Work mode message
                       Text(
                         getWorkModeMessage(),
-                        style: TextStyle(
+                        style: GoogleFonts.nunito(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
@@ -482,16 +549,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer.withOpacity(0.15),
+                              color: const Color(0xFFE8F5E9),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.primary.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                  spreadRadius: 1,
-                                )
-                              ],
                             ),
                             child: Column(
                               children: [
@@ -501,29 +560,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     Icon(
                                       Icons.eco,
                                       size: 20,
-                                      color: colorScheme.primary,
-                                      shadows: [
-                                        Shadow(
-                                          color: colorScheme.primary.withOpacity(0.2),
-                                          offset: const Offset(0, 1),
-                                          blurRadius: 2,
-                                        )
-                                      ],
+                                      color: const Color(0xFF1B5E20),
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      "Plant says:",
-                                      style: TextStyle(
+                                      "Leafy says:",
+                                      style: GoogleFonts.nunito(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: colorScheme.primary,
-                                        shadows: [
-                                          Shadow(
-                                            color: colorScheme.primary.withOpacity(0.2),
-                                            offset: const Offset(0, 1),
-                                            blurRadius: 2,
-                                          )
-                                        ],
+                                        color: const Color(0xFF1B5E20),
                                       ),
                                     ),
                                   ],
@@ -531,17 +576,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 const SizedBox(height: 6),
                                 Text(
                                   displayedQuote,
-                                  style: TextStyle(
+                                  style: GoogleFonts.nunito(
                                     fontSize: 15,
                                     fontStyle: FontStyle.italic,
-                                    color: colorScheme.onPrimaryContainer,
-                                    shadows: [
-                                      Shadow(
-                                        color: colorScheme.onPrimaryContainer.withOpacity(0.2),
-                                        offset: const Offset(0, 1),
-                                        blurRadius: 2,
-                                      )
-                                    ],
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF1B5E20),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -558,15 +597,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 width: 12,
                                 height: 12,
                                 decoration: BoxDecoration(
-                                  color: colorScheme.primaryContainer.withOpacity(0.15),
+                                  color: const Color(0xFFE8F5E9),
                                   borderRadius: BorderRadius.circular(3),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: colorScheme.primary.withOpacity(0.1),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
-                                    )
-                                  ],
                                 ),
                               ),
                             ),
@@ -596,7 +628,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     children: [
                       Text(
                         "How do you feel today?",
-                        style: TextStyle(
+                        style: GoogleFonts.nunito(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
@@ -654,9 +686,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       children: [
                         Text(
                           'Today\'s Mood Score',
-                          style: TextStyle(
+                          style: GoogleFonts.nunito(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: colorScheme.primary,
                           ),
                         ),
@@ -675,8 +707,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             if (todayMoods.isEmpty) {
                               return Text(
                                 'No mood recorded yet today',
-                                style: TextStyle(
+                                style: GoogleFonts.nunito(
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface.withOpacity(0.6),
                                 ),
                               );
@@ -695,17 +728,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   children: [
                                     Text(
                                       averageScore.toStringAsFixed(1),
-                                      style: TextStyle(
+                                      style: GoogleFonts.nunito(
                                         fontSize: 36,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: _getScoreColor(averageScore, colorScheme),
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
                                       '/ 5.0',
-                                      style: TextStyle(
+                                      style: GoogleFonts.nunito(
                                         fontSize: 18,
+                                        fontWeight: FontWeight.w600,
                                         color: colorScheme.onSurface.withOpacity(0.6),
                                       ),
                                     ),
@@ -714,8 +748,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 const SizedBox(height: 8),
                                 Text(
                                   '${todayMoods.length} mood${todayMoods.length > 1 ? 's' : ''} recorded today',
-                                  style: TextStyle(
+                                  style: GoogleFonts.nunito(
                                     fontSize: 14,
+                                    fontWeight: FontWeight.w600,
                                     color: colorScheme.onSurface.withOpacity(0.6),
                                   ),
                                 ),
@@ -730,17 +765,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 const SizedBox(height: 24),
                 // 添加版本号
                 Text(
-                  "Office Leafy v0.1 🌿 Updated 2025-04-02",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "© 2025 Wanming Zhao. All rights reserved.",
-                  style: TextStyle(
+                  "© 2025 Office Leafy. All rights reserved.",
+                  style: GoogleFonts.nunito(
                     fontSize: 10,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface.withOpacity(0.4),
                   ),
                   textAlign: TextAlign.center,
@@ -842,9 +870,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
             ),
           ),
@@ -879,7 +907,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             const SizedBox(height: 8),
             Text(
               mood,
-              style: TextStyle(
+              style: GoogleFonts.nunito(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: getMoodColor(mood).withOpacity(0.8),

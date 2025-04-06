@@ -4,6 +4,7 @@ import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import 'plant_growth_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -12,26 +13,31 @@ class SettingPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
+        title: Text(
           'Reset All Data',
-          style: TextStyle(
-            color: Color(0xFF1B5E20),
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to reset all data? This action cannot be undone.',
-          style: TextStyle(
-            color: Color(0xFF1B5E20),
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(
-                color: Color(0xFF1B5E20),
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
               ),
             ),
           ),
@@ -40,25 +46,151 @@ class SettingPage extends StatelessWidget {
               context.read<ItemState>().resetAllData();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
                     'All data has been reset',
-                    style: TextStyle(color: Colors.white),
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                  backgroundColor: Color(0xFF1B5E20),
+                  backgroundColor: const Color(0xFF1B5E20),
                 ),
               );
             },
-            child: const Text(
+            child: Text(
               'Reset',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
           ),
         ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'About Office Leafy',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Version 0.2',
+              style: GoogleFonts.nunito(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Office Leafy is a companion app that helps you track your mood and grow a virtual plant. Your emotional well-being nurtures your plant\'s growth.',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Author: Wanming Zhao',
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Close',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showContactDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Contact Me',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Follow me on Instagram',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.camera_alt,
+                  color: Color(0xFF1B5E20),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  '@officeleafy',
+                  style: GoogleFonts.nunito(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1B5E20),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Close',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -83,9 +215,9 @@ class SettingPage extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
             ),
           ),
@@ -96,45 +228,103 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final itemState = context.watch<ItemState>();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Color(0xFF1B5E20),
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         backgroundColor: const Color(0xFFFFFCF5),
         elevation: 0,
       ),
-      body: ListView(
-        children: [
-          const SizedBox(height: 16),
-          ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.refresh,
-                color: Colors.red,
-              ),
-            ),
-            title: const Text(
-              'Reset All Data',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: const Text('Clear all progress and start over'),
-            onTap: () => _showResetConfirmationDialog(context),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFCF5),
+              Color(0xFFFFFCF5),
+            ],
           ),
-          const Divider(),
-        ],
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF1B5E20),
+                          ),
+                          title: Text(
+                            'About Office Leafy',
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          onTap: () => _showAboutDialog(context),
+                        ),
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.contact_mail,
+                            color: Color(0xFF1B5E20),
+                          ),
+                          title: Text(
+                            'Contact Me',
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          onTap: () => _showContactDialog(context),
+                        ),
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.orange,
+                          ),
+                          title: Text(
+                            'Reset All Data',
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          onTap: () => _showResetConfirmationDialog(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

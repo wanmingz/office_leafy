@@ -86,8 +86,12 @@ class ItemState extends ChangeNotifier {
       _waterUsed++;
       
       // 检查是否需要生长到第二阶段
-      if (_plantStage == 1 && (_waterUsed >= 2 || _fertilizerUsed >= 1)) {
+      if (_plantStage == 1 && _waterUsed >= 1 && _fertilizerUsed >= 1) {
         _plantStage = 2;
+      }
+      // 检查是否需要生长到第三阶段
+      else if (_plantStage == 2 && (_waterUsed >= 5 || _fertilizerUsed >= 3)) {
+        _plantStage = 3;
       }
       
       _saveData();
@@ -101,8 +105,12 @@ class ItemState extends ChangeNotifier {
       _fertilizerUsed++;
       
       // 检查是否需要生长到第二阶段
-      if (_plantStage == 1 && (_waterUsed >= 2 || _fertilizerUsed >= 1)) {
+      if (_plantStage == 1 && _waterUsed >= 1 && _fertilizerUsed >= 1) {
         _plantStage = 2;
+      }
+      // 检查是否需要生长到第三阶段
+      else if (_plantStage == 2 && (_waterUsed >= 5 || _fertilizerUsed >= 3)) {
+        _plantStage = 3;
       }
       
       _saveData();
@@ -145,15 +153,8 @@ class ItemState extends ChangeNotifier {
 
   // 植物生长相关方法
   void updatePlantGrowth() {
-    DateTime now = DateTime.now();
-    int daysSinceLastGrowth = now.difference(_lastGrowthUpdate).inDays;
-    
-    if (daysSinceLastGrowth >= 3 && _plantStage < 2) {
-      _plantStage++;
-      _lastGrowthUpdate = now;
-      _saveData();
-      notifyListeners();
-    }
+    // 移除时间触发生长的逻辑
+    // 现在只通过使用水和肥料来触发生长
   }
 
   // 心情相关方法

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/item_state.dart';
 import 'emotion_trend_page.dart';
 import 'plant_growth_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
@@ -30,24 +31,29 @@ class ShopPage extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(
           'Purchase ${itemType == 'water' ? 'Water' : 'Fertilizer'}',
-          style: const TextStyle(
-            color: Color(0xFF1B5E20),
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         content: Text(
           'Cost: $cost Leafy Heart${cost > 1 ? 's' : ''}',
-          style: const TextStyle(
-            color: Color(0xFF1B5E20),
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(
-                color: Color(0xFF1B5E20),
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
               ),
             ),
           ),
@@ -65,17 +71,22 @@ class ShopPage extends StatelessWidget {
                 SnackBar(
                   content: Text(
                     '${itemType == 'water' ? 'Water' : 'Fertilizer'} purchased successfully!',
-                    style: const TextStyle(color: Colors.white),
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                   backgroundColor: const Color(0xFF1B5E20),
                 ),
               );
             },
-            child: const Text(
+            child: Text(
               'Purchase',
-              style: TextStyle(
-                color: Color(0xFF1B5E20),
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
               ),
             ),
           ),
@@ -106,24 +117,29 @@ class ShopPage extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(
           'Use ${itemType == 'water' ? 'Water' : 'Fertilizer'}',
-          style: const TextStyle(
-            color: Color(0xFF1B5E20),
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         content: Text(
           'Are you sure you want to use $itemType?',
-          style: const TextStyle(
-            color: Color(0xFF1B5E20),
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(
-                color: Color(0xFF1B5E20),
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
               ),
             ),
           ),
@@ -139,17 +155,22 @@ class ShopPage extends StatelessWidget {
                 SnackBar(
                   content: Text(
                     '$itemType used successfully',
-                    style: const TextStyle(color: Colors.white),
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                   backgroundColor: const Color(0xFF1B5E20),
                 ),
               );
             },
-            child: const Text(
+            child: Text(
               'Use',
-              style: TextStyle(
-                color: Color(0xFF1B5E20),
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
               ),
             ),
           ),
@@ -162,10 +183,25 @@ class ShopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final itemState = context.watch<ItemState>();
     final colorScheme = Theme.of(context).colorScheme;
+    int previousStage = itemState.plantGrowthStage;
+
+    // 监听植物生长状态变化
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (itemState.plantGrowthStage > previousStage) {
+        _showGrowthAlert(context, itemState.plantGrowthStage);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shop & Bag'),
+        title: Text(
+          'Shop & Bag',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
         centerTitle: true,
         actions: [
           Container(
@@ -180,10 +216,10 @@ class ShopPage extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${itemState.leafyHeartsCount}',
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.nunito(
                     fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -200,10 +236,10 @@ class ShopPage extends StatelessWidget {
               // Shop Section
               Text(
                 'Shop',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1B5E20),
                 ),
               ),
               const SizedBox(height: 16),
@@ -235,16 +271,19 @@ class ShopPage extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Water',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                   Text(
                                     'You have: ${itemState.waterCount}',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
@@ -267,10 +306,10 @@ class ShopPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Price: ',
-                                      style: TextStyle(
-                                        color: colorScheme.primary,
-                                        fontWeight: FontWeight.w500,
+                                      style: GoogleFonts.nunito(
                                         fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                     Icon(
@@ -281,9 +320,10 @@ class ShopPage extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       '1',
-                                      style: TextStyle(
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
                                         color: colorScheme.primary,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -328,16 +368,19 @@ class ShopPage extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Fertilizer',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                   Text(
                                     'You have: ${itemState.fertilizerCount}',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
@@ -360,10 +403,10 @@ class ShopPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Price: ',
-                                      style: TextStyle(
-                                        color: colorScheme.primary,
-                                        fontWeight: FontWeight.w500,
+                                      style: GoogleFonts.nunito(
                                         fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                     Icon(
@@ -374,9 +417,10 @@ class ShopPage extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       '2',
-                                      style: TextStyle(
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
                                         color: colorScheme.primary,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -406,10 +450,10 @@ class ShopPage extends StatelessWidget {
               // Bag Section
               Text(
                 'Your Items',
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1B5E20),
                 ),
               ),
               const SizedBox(height: 16),
@@ -441,16 +485,19 @@ class ShopPage extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Water',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                   Text(
-                                    'Available: ${itemState.waterCount}',
-                                    style: TextStyle(
+                                    'You have: ${itemState.waterCount}',
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
@@ -494,16 +541,19 @@ class ShopPage extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Fertilizer',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                   Text(
-                                    'Available: ${itemState.fertilizerCount}',
-                                    style: TextStyle(
+                                    'You have: ${itemState.fertilizerCount}',
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
@@ -618,10 +668,72 @@ class ShopPage extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 添加新的方法用于显示生长提醒
+  void _showGrowthAlert(BuildContext context, int newStage) {
+    String message = '';
+    switch (newStage) {
+      case 2:
+        message = 'Your plant has grown to the Growth stage! 🌱';
+        break;
+      case 3:
+        message = 'Your plant has grown to the Mature stage! 🌿';
+        break;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.eco,
+              color: const Color(0xFF1B5E20),
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Plant Growth Update!',
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
             ),
           ),
         ],

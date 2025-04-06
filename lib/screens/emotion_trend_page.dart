@@ -4,6 +4,7 @@ import '../providers/item_state.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'shop_page.dart';
 import 'plant_growth_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class EmotionTrendPage extends StatefulWidget {
@@ -93,12 +94,12 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Emotion Trends',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Color(0xFF1B5E20),
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
           ),
         ),
         backgroundColor: const Color(0xFFFFFCF5),
@@ -156,9 +157,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                       children: [
                         Text(
                           'Today\'s Mood Score',
-                          style: TextStyle(
+                          style: GoogleFonts.nunito(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: colorScheme.primary,
                           ),
                         ),
@@ -177,8 +178,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                             if (todayMoods.isEmpty) {
                               return Text(
                                 'No mood recorded yet today',
-                                style: TextStyle(
+                                style: GoogleFonts.nunito(
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface.withOpacity(0.6),
                                 ),
                               );
@@ -206,17 +208,18 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                           children: [
                                             Text(
                                               averageScore.toStringAsFixed(1),
-                                              style: TextStyle(
+                                              style: GoogleFonts.nunito(
                                                 fontSize: 36,
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w600,
                                                 color: _getScoreColor(averageScore, colorScheme),
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
                                               '/ 5.0',
-                                              style: TextStyle(
+                                              style: GoogleFonts.nunito(
                                                 fontSize: 18,
+                                                fontWeight: FontWeight.w600,
                                                 color: colorScheme.onSurface.withOpacity(0.6),
                                               ),
                                             ),
@@ -225,8 +228,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                         const SizedBox(height: 8),
                                         Text(
                                           '${todayMoods.length} mood${todayMoods.length > 1 ? 's' : ''} recorded today',
-                                          style: TextStyle(
+                                          style: GoogleFonts.nunito(
                                             fontSize: 14,
+                                            fontWeight: FontWeight.w600,
                                             color: colorScheme.onSurface.withOpacity(0.6),
                                           ),
                                         ),
@@ -238,9 +242,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                       children: [
                                         Text(
                                           'Today\'s Moods:',
-                                          style: TextStyle(
+                                          style: GoogleFonts.nunito(
                                             fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                             color: colorScheme.primary,
                                           ),
                                         ),
@@ -263,17 +267,18 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   mood,
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.nunito(
                                                     fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
                                                     color: _getMoodColor(mood),
-                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   _formatTime(time),
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.nunito(
                                                     fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
                                                     color: colorScheme.onSurface.withOpacity(0.6),
                                                   ),
                                                 ),
@@ -309,9 +314,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                     children: [
                       Text(
                         'Select Time Range',
-                        style: TextStyle(
+                        style: GoogleFonts.nunito(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
                         ),
                       ),
@@ -322,9 +327,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                             value: month,
                             child: Text(
                               month,
-                              style: TextStyle(
+                              style: GoogleFonts.nunito(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                                 color: colorScheme.primary,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           );
@@ -358,9 +364,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                       children: [
                         Text(
                           'Mood Distribution',
-                          style: TextStyle(
+                          style: GoogleFonts.nunito(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: colorScheme.primary,
                           ),
                         ),
@@ -402,10 +408,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                               padding: const EdgeInsets.only(top: 8.0),
                                               child: Text(
                                                 mood,
-                                                style: TextStyle(
-                                                  color: _getMoodColor(mood),
+                                                style: GoogleFonts.nunito(
                                                   fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: _getMoodColor(mood),
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
@@ -420,9 +426,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                           getTitlesWidget: (value, meta) {
                                             return Text(
                                               '${value.toInt()}%',
-                                              style: const TextStyle(
-                                                color: Colors.grey,
+                                              style: GoogleFonts.nunito(
                                                 fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.grey,
                                               ),
                                             );
                                           },
@@ -446,8 +453,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                               : Center(
                                   child: Text(
                                     'No mood data yet',
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                       color: colorScheme.onSurface.withOpacity(0.6),
                                     ),
                                   ),
@@ -479,9 +487,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                       padding: const EdgeInsets.only(left: 16, bottom: 16),
                       child: Text(
                         'Mood Trend',
-                        style: TextStyle(
+                        style: GoogleFonts.nunito(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: colorScheme.primary,
                         ),
                       ),
@@ -504,9 +512,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                           padding: const EdgeInsets.only(top: 8.0),
                                           child: Text(
                                             _formatDate(date),
-                                            style: const TextStyle(
-                                              color: Colors.grey,
+                                            style: GoogleFonts.nunito(
                                               fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.grey,
                                             ),
                                             textAlign: TextAlign.center,
                                           ),
@@ -521,9 +530,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                       getTitlesWidget: (value, meta) {
                                         return Text(
                                           value.toInt().toString(),
-                                          style: const TextStyle(
-                                            color: Colors.grey,
+                                          style: GoogleFonts.nunito(
                                             fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey,
                                           ),
                                         );
                                       },
@@ -567,8 +577,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                           : Center(
                               child: Text(
                                 'No mood data yet',
-                                style: TextStyle(
+                                style: GoogleFonts.nunito(
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface.withOpacity(0.6),
                                 ),
                               ),
@@ -590,9 +601,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                       children: [
                         Text(
                           'Mood History',
-                          style: TextStyle(
+                          style: GoogleFonts.nunito(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: colorScheme.primary,
                           ),
                         ),
@@ -603,8 +614,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                               padding: const EdgeInsets.all(16),
                               child: Text(
                                 'No mood records yet',
-                                style: TextStyle(
+                                style: GoogleFonts.nunito(
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface.withOpacity(0.6),
                                 ),
                               ),
@@ -619,7 +631,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                   padding: const EdgeInsets.symmetric(vertical: 8),
                                   child: Text(
                                     _formatDate(dateEntry.key),
-                                    style: TextStyle(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: colorScheme.primary,
@@ -729,10 +741,10 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
         const SizedBox(width: 4),
         Text(
           '$mood ($count)',
-          style: TextStyle(
+          style: GoogleFonts.nunito(
             fontSize: 12,
+            fontWeight: FontWeight.w600,
             color: color.withOpacity(0.8),
-            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -770,7 +782,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
               children: [
                 Text(
                   mood,
-                  style: TextStyle(
+                  style: GoogleFonts.nunito(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: _getMoodColor(mood),
@@ -780,8 +792,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                   const SizedBox(height: 4),
                   Text(
                     note,
-                    style: TextStyle(
+                    style: GoogleFonts.nunito(
                       fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
@@ -789,8 +802,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                 const SizedBox(height: 4),
                 Text(
                   _formatTime(timestamp),
-                  style: TextStyle(
+                  style: GoogleFonts.nunito(
                     fontSize: 12,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface.withOpacity(0.5),
                   ),
                 ),
@@ -859,10 +873,17 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
   }
 
   Color _getScoreColor(double score, ColorScheme colorScheme) {
-    if (score >= 4.0) return Colors.orange; // 非常好
-    if (score >= 3.0) return Colors.green; // 好
-    if (score >= 2.0) return Colors.amber; // 一般
-    return Colors.blue; // 需要关注
+    if (score >= 3.0) {
+      // 暖色调
+      if (score >= 4.5) return Colors.deepOrange; // 非常好
+      if (score >= 4.0) return Colors.orange;     // 很好
+      return Colors.amber;                         // 好
+    } else {
+      // 冷色调
+      if (score >= 2.0) return Colors.blue;       // 一般
+      if (score >= 1.0) return Colors.indigo;     // 不太好
+      return Colors.purple;                        // 需要关注
+    }
   }
 
   IconData _getMoodIcon(String mood) {
@@ -913,9 +934,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
             ),
           ),
