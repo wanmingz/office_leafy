@@ -13,15 +13,19 @@ dependencies:
     sdk: flutter
   intl: ^0.18.0
   cupertino_icons: ^1.0.8
-  fl_chart: ^0.65.0  # Add this line
+  fl_chart: ^0.65.0
   provider: ^6.1.1
   table_calendar: ^3.0.9
-  shared_preferences: 2.0.15
+  shared_preferences: ^2.2.2
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.9
 
 flutter:
   uses-material-design: true
@@ -37,9 +41,9 @@ flutter:
     # Excited emotion variants
     - assets/plants/stage1_excited.png
     - assets/plants/stage2_excited.png
-    # Loved emotion variants
-    - assets/plants/stage1_loved.png
-    - assets/plants/stage2_loved.png
+    # Grateful emotion variants
+    - assets/plants/stage1_grateful.png
+    - assets/plants/stage2_grateful.png
     # Okay emotion variants
     - assets/plants/stage1_okay.png
     - assets/plants/stage2_okay.png
@@ -49,6 +53,11 @@ flutter:
     # Stressed emotion variants
     - assets/plants/stage1_stressed.png
     - assets/plants/stage2_stressed.png
-    
+    # Tired emotion variants
+    - assets/plants/stage1_tired.png
+    - assets/plants/stage2_tired.png
+    # Stressed annoyed variants
+    - assets/plants/stage1_annoyed.png
+    - assets/plants/stage2_annoyed.png
 
   

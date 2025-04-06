@@ -78,19 +78,15 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
     }
 
     // 计算每种心情的出现次数
-    Map<String, int> moodCounts = {
-      'Excited': 0,
-      'Happy': 0,
-      'Loved': 0,
-      'Okay': 0,
-      'Sad': 0,
-      'Stressed': 0,
-    };
-
-    for (var moodData in moodLog.values) {
-      String mood = moodData['mood'] as String;
+    final moodCounts = <String, int>{};
+    for (var entry in moodLog.entries) {
+      final mood = entry.value['mood'] as String;
       moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
     }
+
+    // 按照分数从高到低排序心情
+    final sortedMoods = moodCounts.keys.toList()
+      ..sort((a, b) => _getMoodValue(b).compareTo(_getMoodValue(a)));
 
     // 计算总心情记录数
     int totalMoods = moodCounts.values.fold(0, (sum, count) => sum + count);
@@ -148,6 +144,156 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // 今日心情得分卡片
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Today\'s Mood Score',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Builder(
+                          builder: (context) {
+                            // 计算今日平均得分
+                            final today = DateTime.now();
+                            final todayMoods = moodLog.entries.where((entry) {
+                              final date = entry.key;
+                              return date.year == today.year &&
+                                     date.month == today.month &&
+                                     date.day == today.day;
+                            }).toList();
+
+                            if (todayMoods.isEmpty) {
+                              return Text(
+                                'No mood recorded yet today',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface.withOpacity(0.6),
+                                ),
+                              );
+                            }
+
+                            // 按时间排序
+                            todayMoods.sort((a, b) => b.key.compareTo(a.key));
+
+                            // 计算平均分
+                            final totalScore = todayMoods
+                                .map((entry) => _getMoodValue(entry.value['mood'] as String))
+                                .reduce((a, b) => a + b);
+                            final averageScore = totalScore / todayMoods.length;
+
+                            return Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    // 左侧：今日心情得分
+                                    Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              averageScore.toStringAsFixed(1),
+                                              style: TextStyle(
+                                                fontSize: 36,
+                                                fontWeight: FontWeight.bold,
+                                                color: _getScoreColor(averageScore, colorScheme),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              '/ 5.0',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                color: colorScheme.onSurface.withOpacity(0.6),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${todayMoods.length} mood${todayMoods.length > 1 ? 's' : ''} recorded today',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: colorScheme.onSurface.withOpacity(0.6),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // 右侧：今日心情记录
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Today\'s Moods:',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: colorScheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ...todayMoods.map((entry) {
+                                          final mood = entry.value['mood'] as String;
+                                          final time = entry.key;
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 4),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 12,
+                                                  height: 12,
+                                                  decoration: BoxDecoration(
+                                                    color: _getMoodColor(mood),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  mood,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: _getMoodColor(mood),
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  _formatTime(time),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: colorScheme.onSurface.withOpacity(0.6),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 // 添加月份选择器
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -226,14 +372,14 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                   BarChartData(
                                     alignment: BarChartAlignment.spaceAround,
                                     maxY: 100,
-                                    barGroups: moodCounts.entries.map((entry) {
-                                      double percentage = (entry.value / totalMoods) * 100;
+                                    barGroups: sortedMoods.map((mood) {
+                                      double percentage = (moodCounts[mood]! / totalMoods) * 100;
                                       return BarChartGroupData(
-                                        x: moodCounts.keys.toList().indexOf(entry.key),
+                                        x: sortedMoods.indexOf(mood),
                                         barRods: [
                                           BarChartRodData(
                                             toY: percentage,
-                                            color: _getMoodColor(entry.key).withOpacity(0.8),
+                                            color: _getMoodColor(mood).withOpacity(0.8),
                                             width: 20,
                                             borderRadius: BorderRadius.circular(4),
                                             backDrawRodData: BackgroundBarChartRodData(
@@ -251,7 +397,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                         sideTitles: SideTitles(
                                           showTitles: true,
                                           getTitlesWidget: (value, meta) {
-                                            String mood = moodCounts.keys.elementAt(value.toInt());
+                                            String mood = sortedMoods.elementAt(value.toInt());
                                             return Padding(
                                               padding: const EdgeInsets.only(top: 8.0),
                                               child: Text(
@@ -697,24 +843,38 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
 
   Color _getMoodColor(String mood) {
     switch (mood) {
-      case 'Excited': return Colors.orange;
-      case 'Happy': return Colors.amber;
-      case 'Loved': return Colors.red;
-      case 'Okay': return Colors.green;
-      case 'Sad': return Colors.blue;
-      case 'Stressed': return Colors.purple;
+      // 好心情 - 暖色调
+      case 'Excited': return Colors.orange;       // 明亮的橙色
+      case 'Happy': return Colors.amber;          // 温暖的琥珀色
+      case 'Grateful': return Colors.deepOrange;  // 深橙色
+      case 'Okay': return Colors.lightGreen;      // 浅绿色
+
+      // 坏心情 - 冷色调
+      case 'Sad': return Colors.blue;             // 蓝色
+      case 'Stressed': return Colors.indigo;      // 靛蓝色
+      case 'Tired': return Colors.blueGrey;       // 蓝灰色
+      case 'Annoyed': return Colors.purple;       // 紫色
       default: return Colors.grey;
     }
+  }
+
+  Color _getScoreColor(double score, ColorScheme colorScheme) {
+    if (score >= 4.0) return Colors.orange; // 非常好
+    if (score >= 3.0) return Colors.green; // 好
+    if (score >= 2.0) return Colors.amber; // 一般
+    return Colors.blue; // 需要关注
   }
 
   IconData _getMoodIcon(String mood) {
     switch (mood) {
       case 'Excited': return Icons.celebration;
       case 'Happy': return Icons.sentiment_very_satisfied;
-      case 'Loved': return Icons.favorite;
+      case 'Grateful': return Icons.favorite;
       case 'Okay': return Icons.sentiment_satisfied;
       case 'Sad': return Icons.sentiment_dissatisfied;
       case 'Stressed': return Icons.psychology;
+      case 'Tired': return Icons.bedtime;
+      case 'Annoyed': return Icons.sentiment_very_dissatisfied;
       default: return Icons.emoji_emotions;
     }
   }
@@ -723,10 +883,12 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
     switch (mood) {
       case 'Excited': return 5.0;
       case 'Happy': return 4.0;
-      case 'Loved': return 4.0;
+      case 'Grateful': return 4.0;
       case 'Okay': return 3.0;
       case 'Sad': return 2.0;
       case 'Stressed': return 1.0;
+      case 'Tired': return 1.5;
+      case 'Annoyed': return 1.5;
       default: return 0.0;
     }
   }

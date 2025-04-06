@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       "Your joy makes the world brighter! 🌈",
       "Stay as amazing as you are! 🌺"
     ],
-    'Loved': [
+    'Grateful': [
       "You are deeply appreciated! 💝",
       "Your presence makes a difference! 💫",
       "You're surrounded by love! 💖",
@@ -57,8 +57,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       "You've got this! 💪",
       "One moment at a time ⏳",
       "You're doing your best 🌟"
+    ],
+    'Tired': [
+      "Rest is not a reward, it's a necessity 💤",
+      "Take a moment to recharge ⚡",
+      "Your body needs rest to perform its best 🌙",
+      "It's okay to take a break 🌿"
+    ],
+    'Annoyed': [
+      "Take a deep breath and let it go 🌬️",
+      "This too shall pass 🌅",
+      "Focus on what you can control 🎯",
+      "You're stronger than this situation 💪"
     ]
   };
+  
+  get ref => null;
 
   @override
   void initState() {
@@ -257,23 +271,51 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     switch (mood) {
       case 'Happy': return Icons.sentiment_very_satisfied;
       case 'Excited': return Icons.celebration;
-      case 'Loved': return Icons.favorite;
+      case 'Grateful': return Icons.favorite;
       case 'Okay': return Icons.sentiment_satisfied;
       case 'Sad': return Icons.sentiment_dissatisfied;
       case 'Stressed': return Icons.psychology;
+      case 'Tired': return Icons.bedtime;
+      case 'Annoyed': return Icons.sentiment_very_dissatisfied;
       default: return Icons.emoji_emotions;
     }
   }
   
   Color getMoodColor(String mood) {
     switch (mood) {
-      case 'Happy': return Colors.amber;
-      case 'Excited': return Colors.orange;
-      case 'Loved': return Colors.red;
-      case 'Okay': return Colors.green;
-      case 'Sad': return Colors.blue;
-      case 'Stressed': return Colors.purple;
+      // 好心情 - 暖色调
+      case 'Excited': return Colors.orange;       // 明亮的橙色
+      case 'Happy': return Colors.amber;          // 温暖的琥珀色
+      case 'Grateful': return Colors.deepOrange;  // 深橙色
+      case 'Okay': return Colors.lightGreen;      // 浅绿色
+
+      // 坏心情 - 冷色调
+      case 'Sad': return Colors.blue;             // 蓝色
+      case 'Stressed': return Colors.indigo;      // 靛蓝色
+      case 'Tired': return Colors.blueGrey;       // 蓝灰色
+      case 'Annoyed': return Colors.purple;       // 紫色
       default: return Colors.grey;
+    }
+  }
+
+  Color _getScoreColor(double score, ColorScheme colorScheme) {
+    if (score >= 4.0) return Colors.orange; // 非常好
+    if (score >= 3.0) return Colors.green; // 好
+    if (score >= 2.0) return Colors.amber; // 一般
+    return Colors.blue; // 需要关注
+  }
+
+  double _getMoodValue(String mood) {
+    switch (mood) {
+      case 'Excited': return 5.0;
+      case 'Happy': return 4.0;
+      case 'Grateful': return 4.0;
+      case 'Okay': return 3.0;
+      case 'Sad': return 2.0;
+      case 'Stressed': return 1.0;
+      case 'Tired': return 1.5;
+      case 'Annoyed': return 1.5;
+      default: return 0.0;
     }
   }
 
@@ -568,20 +610,121 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ),
                       ),
                       const SizedBox(height: 12),
+                      
+                      // 心情按钮布局
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          _buildMoodButton("Excited", Icons.celebration, Colors.orange),
-                          _buildMoodButton("Happy", Icons.sentiment_very_satisfied, Colors.amber),
-                          _buildMoodButton("Loved", Icons.favorite, Colors.red),
-                          _buildMoodButton("Okay", Icons.sentiment_satisfied, Colors.green),
-                          _buildMoodButton("Sad", Icons.sentiment_dissatisfied, Colors.blue),
-                          _buildMoodButton("Stressed", Icons.psychology, Colors.purple),
+                          // 第一行：高分心情
+                          _buildMoodButton("Excited", Icons.celebration),
+                          _buildMoodButton("Happy", Icons.sentiment_very_satisfied),
+                          _buildMoodButton("Grateful", Icons.favorite),
+                          _buildMoodButton("Okay", Icons.sentiment_satisfied),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // 第二行：低分心情
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _buildMoodButton("Sad", Icons.sentiment_dissatisfied),
+                          _buildMoodButton("Tired", Icons.bedtime),
+                          _buildMoodButton("Annoyed", Icons.sentiment_very_dissatisfied),
+                          _buildMoodButton("Stressed", Icons.psychology),
                         ],
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // 今日心情得分卡片
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Today\'s Mood Score',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Builder(
+                          builder: (context) {
+                            // 计算今日平均得分
+                            final today = DateTime.now();
+                            final todayMoods = itemState.moodLog.entries.where((entry) {
+                              final date = entry.key;
+                              return date.year == today.year &&
+                                     date.month == today.month &&
+                                     date.day == today.day;
+                            }).map((entry) => entry.value['mood'] as String).toList();
+
+                            if (todayMoods.isEmpty) {
+                              return Text(
+                                'No mood recorded yet today',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface.withOpacity(0.6),
+                                ),
+                              );
+                            }
+
+                            // 计算平均分
+                            final totalScore = todayMoods
+                                .map((mood) => _getMoodValue(mood))
+                                .reduce((a, b) => (a ?? 0.0) + (b ?? 0.0));
+                            final averageScore = totalScore / todayMoods.length;
+
+                            return Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      averageScore.toStringAsFixed(1),
+                                      style: TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        color: _getScoreColor(averageScore, colorScheme),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '/ 5.0',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: colorScheme.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '${todayMoods.length} mood${todayMoods.length > 1 ? 's' : ''} recorded today',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface.withOpacity(0.6),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -710,7 +853,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildMoodButton(String mood, IconData icon, Color color) {
+  Widget _buildMoodButton(String mood, IconData icon) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -724,13 +867,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               height: 60,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: getMoodColor(mood).withOpacity(0.15),
                 shape: BoxShape.circle,
-                border: Border.all(color: color.withOpacity(0.3), width: 1),
               ),
               child: Icon(
                 icon,
-                color: color,
+                color: getMoodColor(mood),
                 size: 28,
               ),
             ),
@@ -739,8 +881,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               mood,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: color.withOpacity(0.8),
+                fontWeight: FontWeight.w600,
+                color: getMoodColor(mood).withOpacity(0.8),
               ),
               textAlign: TextAlign.center,
             ),
