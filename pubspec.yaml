@@ -16,8 +16,7 @@ dependencies:
   fl_chart: ^0.65.0  # Add this line
   provider: ^6.1.1
   table_calendar: ^3.0.9
-  shared_preferences: ^2.5.3
-  url_launcher: ^6.3.1
+  shared_preferences: 2.0.15
 
 dev_dependencies:
   flutter_test:
