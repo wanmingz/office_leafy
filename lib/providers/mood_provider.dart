@@ -64,7 +64,7 @@ final moodProvider = StateNotifierProvider<MoodNotifier, List<MoodEntry>>((ref) 
   return MoodNotifier();
 });
 
-Color _getMoodColor(String mood) {
+Color getMoodColor(String mood) {
   switch (mood) {
     case 'Happy': return Colors.amber;
     case 'Excited': return Colors.orange;

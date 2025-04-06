@@ -453,11 +453,133 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
               children: [
+                // Leafy says 对话框 - 只在有引语时显示
+                if (displayedQuote.isNotEmpty)
+                  FadeTransition(
+                    opacity: _animation,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF1B5E20).withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          // 云朵装饰
+                          Positioned(
+                            top: -10,
+                            left: 20,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: -15,
+                            right: 20,
+                            child: Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(12.5),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -10,
+                            left: 30,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(7.5),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -12,
+                            right: 30,
+                            child: Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(9),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1B5E20).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        Icons.eco,
+                                        size: 20,
+                                        color: const Color(0xFF1B5E20),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      "Leafy says:",
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF1B5E20),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    displayedQuote,
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 15,
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF1B5E20),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (displayedQuote.isNotEmpty) const SizedBox(height: 16),
                 // Growth stage card
                 Container(
                   height: screenHeight * 0.44,
@@ -477,40 +599,29 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Growth stage indicator
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(2, (index) => 
-                          Container(
-                            width: 10,
-                            height: 10,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: index < itemState.plantGrowthStage 
-                                ? colorScheme.primary 
-                                : colorScheme.primaryContainer.withOpacity(0.3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.primary.withOpacity(0.2),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                )
-                              ],
-                            ),
-                          )
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       // Plant image
                       Hero(
                         tag: 'plant_image',
-                        child: SizedBox(
+                        child: Container(
                           height: screenHeight * 0.32,
                           width: screenHeight * 0.32,
-                          child: Image.asset(
-                            'assets/plants/stage${itemState.plantGrowthStage}_${itemState.currentEmotion.toLowerCase()}.png',
-                            fit: BoxFit.contain,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.primary.withOpacity(0.1),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                                spreadRadius: 2,
+                              )
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/plants/stage${itemState.growthStage}_${itemState.currentEmotion.toLowerCase()}.png',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
@@ -536,78 +647,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                 ),
                 const SizedBox(height: 12),
-                
-                // Plant's message (comfort quote)
-                if (displayedQuote.isNotEmpty)
-                  FadeTransition(
-                    opacity: _animation,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Stack(
-                        children: [
-                          // Speech bubble
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE8F5E9),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.eco,
-                                      size: 20,
-                                      color: const Color(0xFF1B5E20),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      "Leafy says:",
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF1B5E20),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  displayedQuote,
-                                  style: GoogleFonts.nunito(
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF1B5E20),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Speech bubble tail
-                          Positioned(
-                            left: 36,
-                            bottom: -6,
-                            child: Transform.rotate(
-                              angle: -0.5,
-                              child: Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE8F5E9),
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 16),
                 
                 // Mood tracker
                 Container(
@@ -718,7 +757,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             // 计算平均分
                             final totalScore = todayMoods
                                 .map((mood) => _getMoodValue(mood))
-                                .reduce((a, b) => (a ?? 0.0) + (b ?? 0.0));
+                                .reduce((a, b) => a + b);
                             final averageScore = totalScore / todayMoods.length;
 
                             return Column(

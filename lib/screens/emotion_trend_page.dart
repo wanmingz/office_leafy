@@ -530,8 +530,9 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                       getTitlesWidget: (value, meta) {
                                         if (value.toInt() >= groupedMoodData.length) return const Text('');
                                         DateTime date = groupedMoodData.keys.elementAt(value.toInt());
-                                        // 只在偶数位置显示日期
-                                        if (value.toInt() % 2 == 0) {
+                                        // 检查该日期是否有心情数据
+                                        List<Map<String, dynamic>>? dayMoods = groupedMoodData[date];
+                                        if (dayMoods != null && dayMoods.isNotEmpty) {
                                           return Padding(
                                             padding: const EdgeInsets.only(top: 8.0),
                                             child: Text(
@@ -867,32 +868,63 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
             icon: const Icon(Icons.delete_outline),
             color: Colors.red,
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Delete Mood Record'),
-                    content: const Text('Are you sure you want to delete this mood record?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          final itemState = context.read<ItemState>();
-                          itemState.deleteMood(timestamp);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  );
-                },
-              );
+              _showDeleteConfirmationDialog(context, timestamp);
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, DateTime date) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'Delete Record',
+          style: GoogleFonts.nunito(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.red.shade700,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete this mood record?',
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            color: Colors.grey.shade700,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final itemState = context.read<ItemState>();
+              itemState.deleteMood(date);
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Delete',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.red.shade700,
+              ),
+            ),
           ),
         ],
       ),
@@ -964,10 +996,6 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
       case 'Annoyed': return 1.5;
       default: return 0.0;
     }
-  }
-
-  String _getPercentageText(double percentage) {
-    return '${percentage.toStringAsFixed(0)}%';
   }
 
   Widget _buildNavButton({

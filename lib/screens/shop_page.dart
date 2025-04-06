@@ -183,12 +183,12 @@ class ShopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final itemState = context.watch<ItemState>();
     final colorScheme = Theme.of(context).colorScheme;
-    int previousStage = itemState.plantGrowthStage;
+    int previousStage = itemState.growthStage;
 
     // 监听植物生长状态变化
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (itemState.plantGrowthStage > previousStage) {
-        _showGrowthAlert(context, itemState.plantGrowthStage);
+      if (itemState.growthStage > previousStage) {
+        _showGrowthAlert(context, itemState.growthStage);
       }
     });
 
@@ -331,10 +331,16 @@ class ShopPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton(
-                                onPressed: () => _showPurchaseDialog(context, 'water'),
+                                onPressed: itemState.leafyHeartsCount >= 1 
+                                    ? () => _showPurchaseDialog(context, 'water')
+                                    : null,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: itemState.leafyHeartsCount >= 1 
+                                      ? colorScheme.primary 
+                                      : Colors.grey.withOpacity(0.3),
+                                  foregroundColor: itemState.leafyHeartsCount >= 1 
+                                      ? Colors.white 
+                                      : Colors.grey,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -428,10 +434,16 @@ class ShopPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton(
-                                onPressed: () => _showPurchaseDialog(context, 'fertilizer'),
+                                onPressed: itemState.leafyHeartsCount >= 2 
+                                    ? () => _showPurchaseDialog(context, 'fertilizer')
+                                    : null,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: itemState.leafyHeartsCount >= 2 
+                                      ? colorScheme.primary 
+                                      : Colors.grey.withOpacity(0.3),
+                                  foregroundColor: itemState.leafyHeartsCount >= 2 
+                                      ? Colors.white 
+                                      : Colors.grey,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -464,115 +476,27 @@ class ShopPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Water
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.water_drop,
-                                  color: Colors.blue,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Water',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  Text(
-                                    'You have: ${itemState.waterCount}',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
-                            onPressed: () => _showUseItemDialog(context, 'water'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: const Text('Use'),
-                          ),
-                        ],
+                      _buildUseItem(
+                        context,
+                        icon: Icons.water_drop,
+                        title: 'Water',
+                        count: itemState.waterCount,
+                        color: Colors.blue,
+                        onPressed: itemState.waterCount > 0 
+                            ? () => _showUseItemDialog(context, 'water')
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       // Fertilizer
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.eco,
-                                  color: Colors.green,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Fertilizer',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  Text(
-                                    'You have: ${itemState.fertilizerCount}',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
-                            onPressed: () => _showUseItemDialog(context, 'fertilizer'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: const Text('Use'),
-                          ),
-                        ],
+                      _buildUseItem(
+                        context,
+                        icon: Icons.eco,
+                        title: 'Fertilizer',
+                        count: itemState.fertilizerCount,
+                        color: Colors.green,
+                        onPressed: itemState.fertilizerCount > 0 
+                            ? () => _showUseItemDialog(context, 'fertilizer')
+                            : null,
                       ),
                     ],
                   ),
@@ -738,6 +662,74 @@ class ShopPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUseItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required int count,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.nunito(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  'You have: $count',
+                  style: GoogleFonts.nunito(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: onPressed == null 
+                ? Colors.grey.withOpacity(0.1)
+                : Theme.of(context).colorScheme.primary,
+            foregroundColor: onPressed == null 
+                ? Colors.grey
+                : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text('Use'),
+        ),
+      ],
     );
   }
 } 

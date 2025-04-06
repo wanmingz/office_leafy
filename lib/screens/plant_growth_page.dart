@@ -5,8 +5,34 @@ import 'emotion_trend_page.dart';
 import 'shop_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class PlantGrowthPage extends StatelessWidget {
+class PlantGrowthPage extends StatefulWidget {
   const PlantGrowthPage({super.key});
+
+  @override
+  State<PlantGrowthPage> createState() => _PlantGrowthPageState();
+}
+
+class _PlantGrowthPageState extends State<PlantGrowthPage> {
+  int? previousStage;
+
+  @override
+  void initState() {
+    super.initState();
+    final itemState = context.read<ItemState>();
+    previousStage = itemState.growthStage;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final itemState = context.watch<ItemState>();
+    if (itemState.growthStage > (previousStage ?? 0)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showGrowthAlert(context, itemState.growthStage);
+      });
+      previousStage = itemState.growthStage;
+    }
+  }
 
   Widget _buildNavButton({
     required BuildContext context,
@@ -85,6 +111,26 @@ class PlantGrowthPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Plant image
+              Center(
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.asset(
+                      'assets/plants/stage${itemState.growthStage}.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              
               // Plant growth stage card
               Card(
                 child: Padding(
@@ -93,7 +139,7 @@ class PlantGrowthPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Growth Stage: ${itemState.plantGrowthStage}',
+                        'Growth Stage: ${itemState.growthStage}',
                         style: GoogleFonts.nunito(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -101,29 +147,7 @@ class PlantGrowthPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildGrowthStage(
-                            context,
-                            stage: 1,
-                            currentStage: itemState.plantGrowthStage,
-                            title: 'Seedling',
-                          ),
-                          _buildGrowthStage(
-                            context,
-                            stage: 2,
-                            currentStage: itemState.plantGrowthStage,
-                            title: 'Growing',
-                          ),
-                          _buildGrowthStage(
-                            context,
-                            stage: 3,
-                            currentStage: itemState.plantGrowthStage,
-                            title: 'Mature',
-                          ),
-                        ],
-                      ),
+                      _buildGrowthStages(context),
                     ],
                   ),
                 ),
@@ -131,6 +155,10 @@ class PlantGrowthPage extends StatelessWidget {
               const SizedBox(height: 24),
               
               // Growth requirements card
+              _buildGrowthRequirementsCard(context),
+              const SizedBox(height: 24),
+              
+              // Use items card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -138,7 +166,7 @@ class PlantGrowthPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Growth Requirements',
+                        'Bag',
                         style: GoogleFonts.nunito(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -146,20 +174,22 @@ class PlantGrowthPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildRequirementItem(
+                      _buildUseItem(
                         context,
-                        icon: Icons.water_drop,
-                        title: 'Water Requirements',
-                        description: _getWaterRequirement(itemState),
-                        color: Colors.blue,
+                        'Water',
+                        itemState.waterCount,
+                        itemState.waterCount > 0 ? () {
+                          _showUseItemDialog(context, 'water');
+                        } : null,
                       ),
                       const SizedBox(height: 16),
-                      _buildRequirementItem(
+                      _buildUseItem(
                         context,
-                        icon: Icons.eco,
-                        title: 'Fertilizer Requirements',
-                        description: _getFertilizerRequirement(itemState),
-                        color: Colors.green,
+                        'Fertilizer',
+                        itemState.fertilizerCount,
+                        itemState.fertilizerCount > 0 ? () {
+                          _showUseItemDialog(context, 'fertilizer');
+                        } : null,
                       ),
                     ],
                   ),
@@ -275,87 +305,333 @@ class PlantGrowthPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRequirementItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String description,
-    required Color color,
-  }) {
+  Widget _buildGrowthRequirementsCard(BuildContext context) {
+    final itemState = context.watch<ItemState>();
+    final colorScheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Growth Requirements',
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildRequirementRow(
+              context,
+              Icons.water_drop,
+              'Water',
+              _getWaterRequirement(itemState),
+              _getRemainingWaterRequirement(itemState),
+            ),
+            const SizedBox(height: 8),
+            _buildRequirementRow(
+              context,
+              Icons.eco,
+              'Fertilizer',
+              _getFertilizerRequirement(itemState),
+              _getRemainingFertilizerRequirement(itemState),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequirementRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    int total,
+    int remaining,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title == 'Water Requirements' ? 'Water' : 'Fertilizer',
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                description,
-                style: GoogleFonts.nunito(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
+        Icon(icon, color: colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          '$label: $remaining/$total',
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
     );
   }
 
-  String _getWaterRequirement(ItemState itemState) {
-    switch (itemState.plantGrowthStage) {
+  int _getWaterRequirement(ItemState itemState) {
+    switch (itemState.growthStage) {
+      case 0:
+        return 1;
       case 1:
-        final remainingWater = 1 - itemState.waterUsed;
-        return remainingWater > 0
-            ? '$remainingWater more'
-            : 'Done';
+        return 3;
       case 2:
-        final remainingWater = 5 - itemState.waterUsed;
-        return remainingWater > 0
-            ? '$remainingWater more'
-            : 'Done';
-      case 3:
-        return 'Done';
+        return 5;
       default:
-        return 'Done';
+        return 0;
     }
   }
 
-  String _getFertilizerRequirement(ItemState itemState) {
-    switch (itemState.plantGrowthStage) {
+  int _getFertilizerRequirement(ItemState itemState) {
+    switch (itemState.growthStage) {
+      case 0:
+        return 1;
       case 1:
-        final remainingFertilizer = 1 - itemState.fertilizerUsed;
-        return remainingFertilizer > 0
-            ? '$remainingFertilizer more'
-            : 'Done';
+        return 1;
       case 2:
-        final remainingFertilizer = 3 - itemState.fertilizerUsed;
-        return remainingFertilizer > 0
-            ? '$remainingFertilizer more'
-            : 'Done';
-      case 3:
-        return 'Done';
+        return 3;
       default:
-        return 'Done';
+        return 0;
     }
+  }
+
+  int _getRemainingWaterRequirement(ItemState itemState) {
+    return _getWaterRequirement(itemState) - itemState.usedWaterCount;
+  }
+
+  int _getRemainingFertilizerRequirement(ItemState itemState) {
+    return _getFertilizerRequirement(itemState) - itemState.usedFertilizerCount;
+  }
+
+  Widget _buildUseItem(
+    BuildContext context,
+    String itemName,
+    int itemCount,
+    VoidCallback? onPressed,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(
+              itemName == 'Water' ? Icons.water_drop : Icons.local_florist,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '$itemName: $itemCount',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: onPressed == null 
+                ? Colors.grey.withOpacity(0.1)
+                : Theme.of(context).colorScheme.primary,
+            foregroundColor: onPressed == null 
+                ? Colors.grey
+                : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text('Use'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGrowthStages(BuildContext context) {
+    return Consumer<ItemState>(
+      builder: (context, itemState, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildGrowthStage(
+              context,
+              stage: 0,
+              currentStage: itemState.growthStage,
+              title: 'Seed',
+            ),
+            _buildGrowthStage(
+              context,
+              stage: 1,
+              currentStage: itemState.growthStage,
+              title: 'Sprout',
+            ),
+            _buildGrowthStage(
+              context,
+              stage: 2,
+              currentStage: itemState.growthStage,
+              title: 'Growing',
+            ),
+            _buildGrowthStage(
+              context,
+              stage: 3,
+              currentStage: itemState.growthStage,
+              title: 'Mature',
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showGrowthAlert(BuildContext context, int newStage) {
+    String message = '';
+    switch (newStage) {
+      case 1:
+        message = 'Your plant has sprouted! 🌱';
+        break;
+      case 2:
+        message = 'Your plant has grown! 🌿';
+        break;
+      case 3:
+        message = 'Your plant has matured! 🌳';
+        break;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.eco,
+              color: const Color(0xFF1B5E20),
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Plant Growth Update!',
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            child: Text(
+              'OK',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUseItemDialog(BuildContext context, String itemType) {
+    final itemState = Provider.of<ItemState>(context, listen: false);
+    final count = itemType == 'water' ? itemState.waterCount : itemState.fertilizerCount;
+    
+    if (count <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No $itemType available',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          'Use ${itemType == 'water' ? 'Water' : 'Fertilizer'}',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to use $itemType?',
+          style: GoogleFonts.nunito(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              if (itemType == 'water') {
+                itemState.useWater();
+              } else {
+                itemState.useFertilizer();
+              }
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '$itemType used successfully',
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  backgroundColor: const Color(0xFF1B5E20),
+                ),
+              );
+            },
+            child: Text(
+              'Use',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 } 

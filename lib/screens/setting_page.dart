@@ -106,6 +106,15 @@ class SettingPage extends StatelessWidget {
                 color: const Color(0xFF1B5E20),
               ),
             ),
+            SizedBox(height: 16),
+            Text(
+              'Updated on 06 April 2025',
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
           ],
         ),
         actions: [
@@ -220,7 +229,6 @@ class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final itemState = context.watch<ItemState>();
     
     return Scaffold(
       appBar: AppBar(

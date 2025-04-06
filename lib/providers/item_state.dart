@@ -4,15 +4,17 @@ import 'dart:convert';
 
 class ItemState extends ChangeNotifier {
   // 基础数据
+  int _growthStage = 0;
   int _waterCount = 0;
   int _fertilizerCount = 0;
   int _leafyHeartsCount = 0;
-  int _plantStage = 1; // 1: 幼苗, 2: 成长, 3: 成熟
-  int _waterUsed = 0;
-  int _fertilizerUsed = 0;
-  DateTime _lastGrowthUpdate = DateTime.now();
+  DateTime? _lastGrowthUpdate;
   final Map<DateTime, Map<String, dynamic>> _moodLog = {};
   String _currentEmotion = "Happy";
+  
+  // 添加计数器
+  int _usedWaterCount = 0;
+  int _usedFertilizerCount = 0;
 
   // 构造函数
   ItemState() {
@@ -26,9 +28,9 @@ class ItemState extends ChangeNotifier {
     _waterCount = prefs.getInt('waterCount') ?? 0;
     _fertilizerCount = prefs.getInt('fertilizerCount') ?? 0;
     _leafyHeartsCount = prefs.getInt('leafyHeartsCount') ?? 0;
-    _plantStage = prefs.getInt('plantStage') ?? 1;
-    _waterUsed = prefs.getInt('waterUsed') ?? 0;
-    _fertilizerUsed = prefs.getInt('fertilizerUsed') ?? 0;
+    _growthStage = prefs.getInt('growthStage') ?? 0;
+    _usedWaterCount = prefs.getInt('usedWaterCount') ?? 0;
+    _usedFertilizerCount = prefs.getInt('usedFertilizerCount') ?? 0;
     _lastGrowthUpdate = DateTime.fromMillisecondsSinceEpoch(
       prefs.getInt('lastGrowthUpdate') ?? DateTime.now().millisecondsSinceEpoch
     );
@@ -54,10 +56,10 @@ class ItemState extends ChangeNotifier {
     await prefs.setInt('waterCount', _waterCount);
     await prefs.setInt('fertilizerCount', _fertilizerCount);
     await prefs.setInt('leafyHeartsCount', _leafyHeartsCount);
-    await prefs.setInt('plantStage', _plantStage);
-    await prefs.setInt('waterUsed', _waterUsed);
-    await prefs.setInt('fertilizerUsed', _fertilizerUsed);
-    await prefs.setInt('lastGrowthUpdate', _lastGrowthUpdate.millisecondsSinceEpoch);
+    await prefs.setInt('growthStage', _growthStage);
+    await prefs.setInt('usedWaterCount', _usedWaterCount);
+    await prefs.setInt('usedFertilizerCount', _usedFertilizerCount);
+    await prefs.setInt('lastGrowthUpdate', _lastGrowthUpdate?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch);
     await prefs.setString('currentEmotion', _currentEmotion);
 
     // 保存心情日志
@@ -69,31 +71,23 @@ class ItemState extends ChangeNotifier {
   }
 
   // Getters
+  int get growthStage => _growthStage;
   int get waterCount => _waterCount;
   int get fertilizerCount => _fertilizerCount;
   int get leafyHeartsCount => _leafyHeartsCount;
-  int get plantGrowthStage => _plantStage;
-  DateTime get lastGrowthUpdate => _lastGrowthUpdate;
+  DateTime? get lastGrowthUpdate => _lastGrowthUpdate;
   Map<DateTime, Map<String, dynamic>> get moodLog => _moodLog;
   String get currentEmotion => _currentEmotion;
-  int get waterUsed => _waterUsed;
-  int get fertilizerUsed => _fertilizerUsed;
+  int get usedWaterCount => _usedWaterCount;
+  int get usedFertilizerCount => _usedFertilizerCount;
 
   // 物品相关方法
   void useWater() {
     if (_waterCount > 0) {
       _waterCount--;
-      _waterUsed++;
-      
-      // 检查是否需要生长到第二阶段
-      if (_plantStage == 1 && _waterUsed >= 1 && _fertilizerUsed >= 1) {
-        _plantStage = 2;
-      }
-      // 检查是否需要生长到第三阶段
-      else if (_plantStage == 2 && (_waterUsed >= 5 || _fertilizerUsed >= 3)) {
-        _plantStage = 3;
-      }
-      
+      _usedWaterCount++;
+      print('Using water: current count $_usedWaterCount, current stage $_growthStage');
+      _checkGrowth();
       _saveData();
       notifyListeners();
     }
@@ -102,18 +96,33 @@ class ItemState extends ChangeNotifier {
   void useFertilizer() {
     if (_fertilizerCount > 0) {
       _fertilizerCount--;
-      _fertilizerUsed++;
-      
-      // 检查是否需要生长到第二阶段
-      if (_plantStage == 1 && _waterUsed >= 1 && _fertilizerUsed >= 1) {
-        _plantStage = 2;
-      }
-      // 检查是否需要生长到第三阶段
-      else if (_plantStage == 2 && (_waterUsed >= 5 || _fertilizerUsed >= 3)) {
-        _plantStage = 3;
-      }
-      
+      _usedFertilizerCount++;
+      print('Using fertilizer: current count $_usedFertilizerCount, current stage $_growthStage');
+      _checkGrowth();
       _saveData();
+      notifyListeners();
+    }
+  }
+
+  void _checkGrowth() {
+    print('Checking growth: stage $_growthStage, water used $_usedWaterCount, fertilizer used $_usedFertilizerCount');
+    if (_growthStage == 0 && _usedWaterCount >= 1 && _usedFertilizerCount >= 1) {
+      _growthStage = 1;
+      _usedWaterCount = 0;
+      _usedFertilizerCount = 0;
+      print('Growing to stage 1');
+      notifyListeners();
+    } else if (_growthStage == 1 && _usedWaterCount >= 3 && _usedFertilizerCount >= 1) {
+      _growthStage = 2;
+      _usedWaterCount = 0;
+      _usedFertilizerCount = 0;
+      print('Growing to stage 2');
+      notifyListeners();
+    } else if (_growthStage == 2 && (_usedWaterCount >= 5 || _usedFertilizerCount >= 3)) {
+      _growthStage = 3;
+      _usedWaterCount = 0;
+      _usedFertilizerCount = 0;
+      print('Growing to stage 3');
       notifyListeners();
     }
   }
@@ -180,10 +189,10 @@ class ItemState extends ChangeNotifier {
     _waterCount = 0;
     _fertilizerCount = 0;
     _leafyHeartsCount = 0;
-    _plantStage = 1;
-    _waterUsed = 0;
-    _fertilizerUsed = 0;
-    _lastGrowthUpdate = DateTime.now();
+    _growthStage = 0;
+    _usedWaterCount = 0;
+    _usedFertilizerCount = 0;
+    _lastGrowthUpdate = null;
     _moodLog.clear();
     _currentEmotion = "Happy";
     _saveData();
