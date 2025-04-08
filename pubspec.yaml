@@ -34,30 +34,39 @@ flutter:
   assets:
     - assets/plants/
     # Base plant stages
+    - assets/plants/stage0.png
     - assets/plants/stage1.png
     - assets/plants/stage2.png
     # Happy emotion variants
+    - assets/plants/stage0_happy.png
     - assets/plants/stage1_happy.png
     - assets/plants/stage2_happy.png
     # Excited emotion variants
+    - assets/plants/stage0_excited.png
     - assets/plants/stage1_excited.png
     - assets/plants/stage2_excited.png
     # Grateful emotion variants
+    - assets/plants/stage0_grateful.png
     - assets/plants/stage1_grateful.png
     - assets/plants/stage2_grateful.png
     # Okay emotion variants
+    - assets/plants/stage0_okay.png
     - assets/plants/stage1_okay.png
     - assets/plants/stage2_okay.png
     # Sad emotion variants
+    - assets/plants/stage0_sad.png
     - assets/plants/stage1_sad.png
     - assets/plants/stage2_sad.png
     # Stressed emotion variants
+    - assets/plants/stage0_stressed.png
     - assets/plants/stage1_stressed.png
     - assets/plants/stage2_stressed.png
     # Tired emotion variants
+    - assets/plants/stage0_tired.png
     - assets/plants/stage1_tired.png
     - assets/plants/stage2_tired.png
     # Stressed annoyed variants
+    - assets/plants/stage0_annoyed.png
     - assets/plants/stage1_annoyed.png
     - assets/plants/stage2_annoyed.png
 
