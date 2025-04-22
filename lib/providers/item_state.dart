@@ -18,7 +18,18 @@ class ItemState extends ChangeNotifier {
 
   // 构造函数
   ItemState() {
-    _loadData();
+    _initializeData();
+  }
+
+  // 初始化数据
+  Future<void> _initializeData() async {
+    try {
+      await _loadData();
+    } catch (e) {
+      print('Error loading data: $e');
+      // 如果加载失败，使用默认值
+      _saveData();
+    }
   }
 
   // 加载保存的数据
@@ -39,11 +50,16 @@ class ItemState extends ChangeNotifier {
     // 加载心情日志
     String? moodLogJson = prefs.getString('moodLog');
     if (moodLogJson != null) {
-      Map<String, dynamic> decodedLog = json.decode(moodLogJson);
-      _moodLog.clear();
-      decodedLog.forEach((key, value) {
-        _moodLog[DateTime.parse(key)] = Map<String, dynamic>.from(value);
-      });
+      try {
+        Map<String, dynamic> decodedLog = json.decode(moodLogJson);
+        _moodLog.clear();
+        decodedLog.forEach((key, value) {
+          _moodLog[DateTime.parse(key)] = Map<String, dynamic>.from(value);
+        });
+      } catch (e) {
+        print('Error decoding mood log: $e');
+        _moodLog.clear();
+      }
     }
 
     notifyListeners();

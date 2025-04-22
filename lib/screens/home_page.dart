@@ -88,6 +88,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       curve: Curves.easeInOut,
     );
 
+    // 设置默认消息
+    setState(() {
+      displayedQuote = getWorkModeMessage();
+    });
+    _animationController.reset();
+    _animationController.forward();
+
     // 初始化时检查植物生长
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ItemState>().updatePlantGrowth();
@@ -457,106 +464,163 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Leafy says 对话框 - 只在有引语时显示
-                if (displayedQuote.isNotEmpty)
-                  FadeTransition(
-                    opacity: _animation,
+                // Growth stage card
+                Container(
+                  height: screenHeight * 0.35,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                        spreadRadius: 2,
+                      )
+                    ],
+                  ),
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Plant image
+                      Hero(
+                        tag: 'plant_image',
+                        child: Container(
+                          height: screenHeight * 0.28,
+                          width: screenHeight * 0.28,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.primary.withOpacity(0.1),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                                spreadRadius: 2,
+                              )
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/plants/stage${itemState.growthStage > 2 ? 2 : itemState.growthStage}_${itemState.currentEmotion.toLowerCase()}.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                // Leafy says 容器
+                const SizedBox(height: 6),
+                FadeTransition(
+                  opacity: _animation,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF1B5E20).withOpacity(0.1),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                          spreadRadius: 2,
+                        )
+                      ],
+                    ),
                     child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE8F5E9).withOpacity(0.8),
                         borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF1B5E20).withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: Stack(
                         children: [
                           // 云朵装饰
                           Positioned(
+                            top: -6,
+                            left: 12,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                          Positioned(
                             top: -10,
-                            left: 20,
+                            right: 12,
                             child: Container(
-                              width: 20,
-                              height: 20,
+                              width: 16,
+                              height: 16,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFE8F5E9).withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                           ),
                           Positioned(
-                            top: -15,
-                            right: 20,
+                            bottom: -6,
+                            left: 18,
                             child: Container(
-                              width: 25,
-                              height: 25,
+                              width: 10,
+                              height: 10,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFE8F5E9).withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(12.5),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             ),
                           ),
                           Positioned(
-                            bottom: -10,
-                            left: 30,
+                            bottom: -8,
+                            right: 18,
                             child: Container(
-                              width: 15,
-                              height: 15,
+                              width: 12,
+                              height: 12,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFE8F5E9).withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(7.5),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: -12,
-                            right: 30,
-                            child: Container(
-                              width: 18,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8F5E9).withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(9),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(10),
                             child: Column(
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(6),
+                                      padding: const EdgeInsets.all(3),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF1B5E20).withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Icon(
                                         Icons.eco,
-                                        size: 20,
+                                        size: 14,
                                         color: const Color(0xFF1B5E20),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 4),
                                     Text(
                                       "Leafy says:",
                                       style: GoogleFonts.nunito(
-                                        fontSize: 14,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                         color: const Color(0xFF1B5E20),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 4),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.8),
                                     borderRadius: BorderRadius.circular(16),
@@ -579,74 +643,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ),
                     ),
                   ),
-                if (displayedQuote.isNotEmpty) const SizedBox(height: 16),
-                // Growth stage card
-                Container(
-                  height: screenHeight * 0.44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                        spreadRadius: 2,
-                      )
-                    ],
-                  ),
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Plant image
-                      Hero(
-                        tag: 'plant_image',
-                        child: Container(
-                          height: screenHeight * 0.32,
-                          width: screenHeight * 0.32,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.withOpacity(0.1),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                                spreadRadius: 2,
-                              )
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/plants/stage${itemState.growthStage}_${itemState.currentEmotion.toLowerCase()}.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Work mode message
-                      Text(
-                        getWorkModeMessage(),
-                        style: GoogleFonts.nunito(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.primary,
-                          shadows: [
-                            Shadow(
-                              color: colorScheme.primary.withOpacity(0.2),
-                              offset: const Offset(0, 1),
-                              blurRadius: 2,
-                            )
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 
                 // Mood tracker
                 Container(
