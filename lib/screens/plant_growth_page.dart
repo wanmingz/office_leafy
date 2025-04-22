@@ -402,14 +402,6 @@ class _PlantGrowthPageState extends State<PlantGrowthPage> {
     }
   }
 
-  int _getRemainingWaterRequirement(ItemState itemState) {
-    return _getWaterRequirement(itemState) - itemState.usedWaterCount;
-  }
-
-  int _getRemainingFertilizerRequirement(ItemState itemState) {
-    return _getFertilizerRequirement(itemState) - itemState.usedFertilizerCount;
-  }
-
   int _getUniqueMoodDays(ItemState itemState) {
     final uniqueDays = itemState.moodLog.keys.map((date) => 
       DateTime(date.year, date.month, date.day)

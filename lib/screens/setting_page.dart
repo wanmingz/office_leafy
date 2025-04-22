@@ -195,6 +195,67 @@ class SettingPage extends StatelessWidget {
     );
   }
 
+  void _showRecentUpdateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Recent Updates',
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B5E20),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Version 0.2',
+              style: GoogleFonts.nunito(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '• Optimized plant growth logic\n• Added mood record days display\n• Improved water and fertilizer usage counting\n• Fixed navigation issues\n• Updated plant mood images',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Updated on 22 April 2025',
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Close',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1B5E20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildNavButton({
     required BuildContext context,
     required IconData icon,
@@ -271,18 +332,18 @@ class SettingPage extends StatelessWidget {
                       children: [
                         ListTile(
                           leading: const Icon(
-                            Icons.info_outline,
+                            Icons.update,
                             color: Color(0xFF1B5E20),
                           ),
                           title: Text(
-                            'About Office Leafy',
+                            'Recent Updates',
                             style: GoogleFonts.nunito(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: colorScheme.primary,
                             ),
                           ),
-                          onTap: () => _showAboutDialog(context),
+                          onTap: () => _showRecentUpdateDialog(context),
                         ),
                         const Divider(),
                         ListTile(
@@ -315,6 +376,22 @@ class SettingPage extends StatelessWidget {
                             ),
                           ),
                           onTap: () => _showResetConfirmationDialog(context),
+                        ),
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF1B5E20),
+                          ),
+                          title: Text(
+                            'About Office Leafy',
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          onTap: () => _showAboutDialog(context),
                         ),
                       ],
                     ),
