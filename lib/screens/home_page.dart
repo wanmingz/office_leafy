@@ -466,7 +466,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               children: [
                 // Growth stage card
                 Container(
-                  height: screenHeight * 0.35,
+                  height: screenHeight * 0.4,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -487,8 +487,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       Hero(
                         tag: 'plant_image',
                         child: Container(
-                          height: screenHeight * 0.28,
-                          width: screenHeight * 0.28,
+                          height: screenHeight * 0.32,
+                          width: screenHeight * 0.32,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,

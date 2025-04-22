@@ -329,7 +329,7 @@ class _PlantGrowthPageState extends State<PlantGrowthPage> {
               Icons.water_drop,
               'Water',
               _getWaterRequirement(itemState),
-              _getRemainingWaterRequirement(itemState),
+              itemState.usedWaterCount,
             ),
             const SizedBox(height: 8),
             _buildRequirementRow(
@@ -337,7 +337,15 @@ class _PlantGrowthPageState extends State<PlantGrowthPage> {
               Icons.eco,
               'Fertilizer',
               _getFertilizerRequirement(itemState),
-              _getRemainingFertilizerRequirement(itemState),
+              itemState.usedFertilizerCount,
+            ),
+            const SizedBox(height: 8),
+            _buildRequirementRow(
+              context,
+              Icons.mood,
+              'Mood Record Days',
+              _getMoodRequirement(itemState),
+              _getUniqueMoodDays(itemState),
             ),
           ],
         ),
@@ -386,7 +394,7 @@ class _PlantGrowthPageState extends State<PlantGrowthPage> {
       case 0:
         return 1;
       case 1:
-        return 1;
+        return 2;
       case 2:
         return 3;
       default:
@@ -400,6 +408,26 @@ class _PlantGrowthPageState extends State<PlantGrowthPage> {
 
   int _getRemainingFertilizerRequirement(ItemState itemState) {
     return _getFertilizerRequirement(itemState) - itemState.usedFertilizerCount;
+  }
+
+  int _getUniqueMoodDays(ItemState itemState) {
+    final uniqueDays = itemState.moodLog.keys.map((date) => 
+      DateTime(date.year, date.month, date.day)
+    ).toSet().length;
+    return uniqueDays;
+  }
+
+  int _getMoodRequirement(ItemState itemState) {
+    switch (itemState.growthStage) {
+      case 0:
+        return 3;
+      case 1:
+        return 5;
+      case 2:
+        return 7;
+      default:
+        return 0;
+    }
   }
 
   Widget _buildUseItem(
