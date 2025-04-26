@@ -90,29 +90,11 @@ class SettingPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Version 0.2',
-              style: GoogleFonts.nunito(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1B5E20),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
               'Office Leafy is a companion app that helps you track your mood and grow a virtual plant. Your emotional well-being nurtures your plant\'s growth.',
               style: GoogleFonts.nunito(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF1B5E20),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Updated on 06 April 2025',
-              style: GoogleFonts.nunito(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
               ),
             ),
           ],
@@ -212,7 +194,7 @@ class SettingPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Version 0.2',
+              'Version 0.3',
               style: GoogleFonts.nunito(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -221,7 +203,7 @@ class SettingPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '• Optimized plant growth logic\n• Added mood record days display\n• Improved water and fertilizer usage counting\n• Fixed navigation issues\n• Updated plant mood images',
+              '• Optimized plant growth logic\n• Added mood record days display\n• Improved water and fertilizer usage counting\n• Fixed navigation issues\n• Updated plant mood images\n• Added mood filter in history',
               style: GoogleFonts.nunito(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -230,7 +212,7 @@ class SettingPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Updated on 22 April 2025',
+              'Updated on 26th April 2025',
               style: GoogleFonts.nunito(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

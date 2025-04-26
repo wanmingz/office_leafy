@@ -16,6 +16,7 @@ class EmotionTrendPage extends StatefulWidget {
 
 class _EmotionTrendPageState extends State<EmotionTrendPage> {
   String _selectedMonth = 'This Month';
+  String? _selectedMoodFilter;  // 添加心情筛选状态
   final List<String> _months = [
     'This Week',
     'This Month',
@@ -652,13 +653,53 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Mood History',
-                          style: GoogleFonts.nunito(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.primary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Mood History',
+                              style: GoogleFonts.nunito(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            PopupMenuButton<String>(
+                              icon: Icon(
+                                Icons.filter_list,
+                                color: colorScheme.primary,
+                              ),
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: null,
+                                  child: Text(
+                                    'All Moods',
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                ...moodCounts.keys.map((mood) => PopupMenuItem(
+                                  value: mood,
+                                  child: Text(
+                                    mood,
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: _getMoodColor(mood),
+                                    ),
+                                  ),
+                                )).toList(),
+                              ],
+                              onSelected: (String? value) {
+                                setState(() {
+                                  _selectedMoodFilter = value;
+                                });
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         if (groupedMoodData.isEmpty)
@@ -677,6 +718,13 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                           )
                         else
                           ...groupedMoodData.entries.map((dateEntry) {
+                            // 根据筛选条件过滤心情记录
+                            final filteredMoods = _selectedMoodFilter == null
+                                ? dateEntry.value
+                                : dateEntry.value.where((mood) => mood['mood'] == _selectedMoodFilter).toList();
+                            
+                            if (filteredMoods.isEmpty) return const SizedBox.shrink();
+                            
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -691,7 +739,7 @@ class _EmotionTrendPageState extends State<EmotionTrendPage> {
                                     ),
                                   ),
                                 ),
-                                ...dateEntry.value.map((moodEntry) {
+                                ...filteredMoods.map((moodEntry) {
                                   return _buildMoodHistoryItem(
                                     moodEntry['mood'] as String,
                                     moodEntry['note'] as String,
